@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Infrastructure Landscape 2026 — Interactive Map of 340+ AI/ML Tools</title>
+    <meta name="description" content="Explore the complete AI/ML infrastructure ecosystem. 340+ tools across 28 categories — frameworks, model providers, vector databases, GPU clouds, and more. Interactive force-directed graph.">
+    <meta name="author" content="DRPozdniakov">
+
+    <!-- Open Graph / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="AI Infrastructure Landscape 2026">
+    <meta property="og:description" content="Interactive map of 340+ AI/ML tools across 28 categories. Frameworks, model providers, vector DBs, GPU clouds, and more.">
+    <meta property="og:url" content="https://drpozdniakov.github.io/ai-infrastructure-map/">
+    <meta property="og:site_name" content="AI Infrastructure Map">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AI Infrastructure Landscape 2026">
+    <meta name="twitter:description" content="Interactive map of 340+ AI/ML tools across 28 categories.">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; background: #0f0f1a; overflow: hidden; }
+
+        /* Hero Header */
+        #header {
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 40%, #16213e 100%);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 18px 30px 14px;
+            color: white;
+            position: relative;
+            z-index: 10;
+            animation: fadeInDown 0.6s ease-out;
+        }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        #header h1 {
+            margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 50%, #ff6b6b 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+        }
+        @keyframes gradientShift { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }
+
+        #header p { margin: 6px 0 0; color: #8892b0; font-size: 13px; letter-spacing: 0.2px; }
+
+        .stat-pills {
+            display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;
+            animation: fadeIn 0.8s ease-out 0.3s both;
+        }
+        .stat-pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+            background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2);
+            color: #64ffda; letter-spacing: 0.3px;
+        }
+        .stat-pill .num { color: #00d4ff; }
+
+        #graph { width: 100vw; height: calc(100vh - 90px); }
+
+        /* Node types */
+        .node-root { fill: #ff6b6b; cursor: pointer; filter: drop-shadow(0 0 10px #ff6b6b); }
+        .node-category { fill: #00d4ff; cursor: pointer; filter: drop-shadow(0 0 6px #00d4ff); }
+        .node-subcategory { fill: #7c3aed; cursor: pointer; filter: drop-shadow(0 0 4px #7c3aed); }
+        .node-tool { fill: #4ade80; cursor: pointer; transition: all 0.2s; }
+        .node-tool:hover { fill: #86efac; filter: drop-shadow(0 0 8px #4ade80); }
+
+        /* Icon background for visibility */
+        .icon-bg { fill: white; opacity: 0.95; }
+        .node-group:hover .icon-bg { opacity: 1; }
+        .node-group:hover { filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.6)); }
+
+        /* Labels */
+        .node-label { font-size: 8px; fill: #aaa; pointer-events: none; }
+        .root-label { font-size: 14px; fill: white; font-weight: 700; pointer-events: none; }
+        .category-label { font-size: 10px; fill: #00d4ff; font-weight: 600; pointer-events: none; }
+        .subcategory-label { font-size: 9px; fill: #c4b5fd; font-weight: 500; pointer-events: none; }
+
+        .link { stroke: #333; stroke-width: 1px; }
+        .link-category { stroke: #00d4ff; stroke-width: 2px; stroke-opacity: 0.3; }
+        .link-subcategory { stroke: #7c3aed; stroke-width: 1.5px; stroke-opacity: 0.25; }
+        .link-tool { stroke: #4ade80; stroke-width: 1px; stroke-opacity: 0.2; }
+
+        #legend { position: absolute; top: 130px; right: 20px; background: rgba(26, 26, 46, 0.9);
+                  border: 1px solid rgba(51,51,51,0.5); border-radius: 10px; padding: 15px; color: #ccc; backdrop-filter: blur(12px);
+                  animation: fadeIn 0.6s ease-out 0.5s both; }
+        #legend h3 { margin: 0 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+        .legend-item { display: flex; align-items: center; margin: 5px 0; font-size: 11px; }
+        .legend-circle { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+
+        #tooltip { position: absolute; background: rgba(26, 26, 46, 0.98); border: 1px solid #00d4ff;
+                   border-radius: 8px; padding: 15px; font-size: 11px; display: none;
+                   max-width: 350px; color: #e0e0e0; z-index: 100; box-shadow: 0 4px 20px rgba(0,212,255,0.2); backdrop-filter: blur(10px); }
+        #tooltip .name { color: #00d4ff; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        #tooltip .desc { color: #aaa; font-size: 11px; margin: 8px 0; line-height: 1.4; }
+        #tooltip .detection { color: #4ade80; font-family: monospace; font-size: 10px; background: #1a1a2e; padding: 6px 10px; border-radius: 4px; margin: 8px 0; }
+        #tooltip .tags { margin-top: 10px; }
+        #tooltip .tag { display: inline-block; background: #7c3aed; color: white; font-size: 9px; padding: 2px 8px; border-radius: 10px; margin-right: 4px; }
+        #tooltip .url { color: #60a5fa; font-size: 10px; margin-top: 8px; }
+        #tooltip .hint { color: #fbbf24; font-size: 10px; margin-top: 6px; font-style: italic; }
+
+        #stats { position: absolute; bottom: 20px; left: 20px; background: rgba(26, 26, 46, 0.9);
+                 border: 1px solid rgba(51,51,51,0.5); border-radius: 8px; padding: 12px 16px; font-size: 11px; color: #556; backdrop-filter: blur(10px); }
+        #stats a { color: #7c3aed; text-decoration: none; }
+        #stats a:hover { color: #00d4ff; }
+
+        #filters { position: absolute; top: 130px; left: 20px; background: rgba(26, 26, 46, 0.9);
+                   border: 1px solid rgba(51,51,51,0.5); border-radius: 10px; padding: 15px; color: #ccc; backdrop-filter: blur(12px); max-height: 65vh; overflow-y: auto;
+                   animation: fadeIn 0.6s ease-out 0.5s both; }
+        #filters h3 { margin: 0 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+        #filters button {
+            display: block; width: 100%; margin: 4px 0; padding: 8px 12px;
+            background: #1a1a2e; border: 1px solid #333; border-radius: 4px;
+            color: #ccc; cursor: pointer; font-size: 10px; text-align: left;
+            transition: all 0.2s;
+        }
+        #filters button:hover { background: #2a2a4e; border-color: #00d4ff; }
+        #filters button.active { background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); color: white; border-color: transparent; }
+        #filters .filter-count { float: right; opacity: 0.6; }
+
+        #search { position: absolute; top: 16px; right: 30px; z-index: 20; animation: fadeIn 0.6s ease-out 0.4s both; }
+        #search input {
+            padding: 10px 15px; width: 280px; background: rgba(26, 26, 46, 0.95);
+            border: 1px solid #333; border-radius: 6px; color: #e0e0e0; font-size: 12px; backdrop-filter: blur(10px);
+        }
+        #search input:focus { outline: none; border-color: #00d4ff; box-shadow: 0 0 10px rgba(0,212,255,0.3); }
+        #search input::placeholder { color: #666; }
+
+        #search-dropdown {
+            position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px;
+            background: rgba(26, 26, 46, 0.98); border: 1px solid #00d4ff; border-radius: 6px;
+            max-height: 300px; overflow-y: auto; display: none; z-index: 200;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5); backdrop-filter: blur(12px);
+        }
+        #search-dropdown.visible { display: block; }
+        .search-item {
+            padding: 8px 14px; cursor: pointer; font-size: 11px; color: #ccc;
+            border-bottom: 1px solid rgba(51,51,51,0.3); display: flex; align-items: center; gap: 8px;
+            transition: background 0.15s;
+        }
+        .search-item:last-child { border-bottom: none; }
+        .search-item:hover, .search-item.active { background: rgba(0, 212, 255, 0.1); }
+        .search-item .item-name { color: #e0e0e0; font-weight: 600; }
+        .search-item .item-category { color: #7c3aed; font-size: 10px; }
+        .search-item .item-icon { width: 16px; height: 16px; border-radius: 3px; }
+
+        .path-highlight { stroke: #00d4ff !important; stroke-width: 3px !important; stroke-opacity: 1 !important; }
+        .path-node-glow { filter: drop-shadow(0 0 12px #00d4ff) !important; }
+
+        #size-legend { position: absolute; bottom: 20px; right: 20px; background: rgba(26, 26, 46, 0.9);
+                       border: 1px solid rgba(51,51,51,0.5); border-radius: 10px; padding: 15px; color: #ccc; backdrop-filter: blur(12px); }
+        #size-legend h3 { margin: 0 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+        .size-item { display: flex; align-items: center; margin: 6px 0; font-size: 10px; }
+        .size-circle { border-radius: 50%; background: #4ade80; margin-right: 10px; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1a1a2e; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444; }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1>AI Infrastructure Landscape 2026</h1>
+        <p>An interactive map of the entire AI/ML ecosystem — click any tool to visit its website</p>
+        <div class="stat-pills">
+            <span class="stat-pill"><span class="num">340+</span> Tools</span>
+            <span class="stat-pill"><span class="num">28</span> Categories</span>
+            <span class="stat-pill"><span class="num">60+</span> Startups</span>
+            <span class="stat-pill">🖱️ All Clickable</span>
+        </div>
+    </div>
+    <div id="search">
+        <input type="text" id="searchInput" placeholder="Search tools..." autocomplete="off">
+        <div id="search-dropdown"></div>
+    </div>
+    <svg id="graph"></svg>
+    <div id="legend">
+        <h3>Node Types</h3>
+        <div class="legend-item"><div class="legend-circle" style="background:#ff6b6b"></div>AI Infrastructure</div>
+        <div class="legend-item"><div class="legend-circle" style="background:#00d4ff"></div>Category</div>
+        <div class="legend-item"><div class="legend-circle" style="background:#7c3aed"></div>Subcategory</div>
+        <div class="legend-item"><div class="legend-circle" style="background:#4ade80"></div>Tool (click to open)</div>
+    </div>
+    <div id="size-legend">
+        <h3>Company Scale</h3>
+        <div class="size-item"><div class="size-circle" style="width:24px;height:24px"></div>Large ($1B+)</div>
+        <div class="size-item"><div class="size-circle" style="width:16px;height:16px"></div>Medium ($100M+)</div>
+        <div class="size-item"><div class="size-circle" style="width:10px;height:10px"></div>Small ($10M+)</div>
+        <div class="size-item"><div class="size-circle" style="width:6px;height:6px"></div>Startup/OSS</div>
+    </div>
+    <div id="filters">
+        <h3>Filter by Type</h3>
+        <button class="active" data-filter="all" data-filter-type="tag">All Tools <span class="filter-count">280+</span></button>
+        <button data-filter="llm" data-filter-type="tag">LLM & Agents <span class="filter-count">45</span></button>
+        <button data-filter="training" data-filter-type="tag">Training & Fine-tuning <span class="filter-count">40</span></button>
+        <button data-filter="infra" data-filter-type="tag">Infrastructure <span class="filter-count">50</span></button>
+        <button data-filter="data" data-filter-type="tag">Data & Storage <span class="filter-count">45</span></button>
+        <button data-filter="observability" data-filter-type="tag">Observability <span class="filter-count">35</span></button>
+        <button data-filter="multimodal" data-filter-type="tag">Multimodal <span class="filter-count">40</span></button>
+        <button data-filter="mcp" data-filter-type="tag">MCP Ecosystem <span class="filter-count">20</span></button>
+
+        <h3 style="margin-top: 20px;">Filter by Size</h3>
+        <button class="active" data-filter="all" data-filter-type="size">All Sizes</button>
+        <button data-filter="large" data-filter-type="size">🏢 Large ($1B+)</button>
+        <button data-filter="medium" data-filter-type="size">🏬 Medium ($100M+)</button>
+        <button data-filter="small" data-filter-type="size">🏠 Small ($10M+)</button>
+        <button data-filter="tiny" data-filter-type="size">🚀 Startup/OSS</button>
+    </div>
+    <div id="tooltip"></div>
+    <div id="stats">
+        Built by <a href="https://github.com/DRPozdniakov" target="_blank">DRPozdniakov</a> · <a href="https://github.com/DRPozdniakov/ai-infrastructure-map" target="_blank">GitArc</a> · 2026
+    </div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        // Size mapping: large=12, medium=8, small=6, tiny=4
+        const sizeMap = { large: 12, medium: 8, small: 6, tiny: 4 };
+
+        // Icon URL mappings using LobeHub CDN and Simple Icons
+        const LOBE_CDN = "https://unpkg.com/@lobehub/icons-static-svg@latest/icons";
+        const SIMPLE_CDN = "https://cdn.simpleicons.org";
+
+        const iconMap = {
+            // ============ MODEL PROVIDERS ============
+            openai: `${LOBE_CDN}/openai.svg`,
+            anthropic: `${LOBE_CDN}/anthropic.svg`,
+            google_ai: `${LOBE_CDN}/gemini.svg`,
+            mistral: `${LOBE_CDN}/mistral.svg`,
+            cohere: `${LOBE_CDN}/cohere.svg`,
+            groq: `${LOBE_CDN}/groq.svg`,
+            together: `${LOBE_CDN}/together.svg`,
+            fireworks: `${LOBE_CDN}/fireworks.svg`,
+            replicate: `${LOBE_CDN}/replicate.svg`,
+            bedrock: `${LOBE_CDN}/aws.svg`,
+            perplexity: `${LOBE_CDN}/perplexity.svg`,
+            deepseek: `${LOBE_CDN}/deepseek.svg`,
+            ollama: `${LOBE_CDN}/ollama.svg`,
+            qwen: `${LOBE_CDN}/qwen.svg`,
+            xai: `${LOBE_CDN}/grok.svg`,
+
+            // ============ LLM ORCHESTRATION ============
+            langchain: `${LOBE_CDN}/langchain.svg`,
+            llamaindex: `${LOBE_CDN}/llamaindex.svg`,
+            haystack: `${LOBE_CDN}/deepset.svg`,
+            dspy: `${LOBE_CDN}/dspy.svg`,
+            semantic: `${LOBE_CDN}/microsoft.svg`,
+            mirascope: `${LOBE_CDN}/mirascope.svg`,
+            marvin: `${LOBE_CDN}/prefect.svg`,
+            magentic: `${SIMPLE_CDN}/magnet`,
+
+            // ============ AGENT FRAMEWORKS ============
+            langgraph: `${LOBE_CDN}/langgraph.svg`,
+            crewai: `${LOBE_CDN}/crewai.svg`,
+            autogen: `${LOBE_CDN}/microsoft.svg`,
+            pydantic_ai: `${LOBE_CDN}/pydantic.svg`,
+            instructor: `${LOBE_CDN}/instructor.svg`,
+            guidance: `${LOBE_CDN}/microsoft.svg`,
+            outlines: `${LOBE_CDN}/outlines.svg`,
+            lmql: `${LOBE_CDN}/lmql.svg`,
+            smolagents: `${LOBE_CDN}/huggingface.svg`,
+            letta: `${LOBE_CDN}/letta.svg`,
+            agentops: `${LOBE_CDN}/agentops.svg`,
+
+            // ============ VISUAL BUILDERS ============
+            langflow: `${LOBE_CDN}/langflow.svg`,
+            flowise: `${LOBE_CDN}/flowise.svg`,
+            n8n: `${LOBE_CDN}/n8n.svg`,
+            dify: `${LOBE_CDN}/dify.svg`,
+            rivet: `${LOBE_CDN}/rivet.svg`,
+            comfyui: `${LOBE_CDN}/comfyui.svg`,
+
+            // ============ WORKFLOW ORCHESTRATION ============
+            temporal: `${LOBE_CDN}/temporal.svg`,
+            prefect: `${LOBE_CDN}/prefect.svg`,
+            airflow: `${SIMPLE_CDN}/apacheairflow`,
+            dagster: `${LOBE_CDN}/dagster.svg`,
+            inngest: `${LOBE_CDN}/inngest.svg`,
+            celery: `${SIMPLE_CDN}/celery`,
+            ray: `${LOBE_CDN}/ray.svg`,
+            metaflow: `${SIMPLE_CDN}/netflix`,
+            kubeflow: `${LOBE_CDN}/kubeflow.svg`,
+            flyte: `${LOBE_CDN}/flyte.svg`,
+            zenml: `${LOBE_CDN}/zenml.svg`,
+
+            // ============ HUGGINGFACE ECOSYSTEM ============
+            transformers: `${LOBE_CDN}/huggingface.svg`,
+            diffusers: `${LOBE_CDN}/huggingface.svg`,
+            accelerate: `${LOBE_CDN}/huggingface.svg`,
+            peft: `${LOBE_CDN}/huggingface.svg`,
+            trl: `${LOBE_CDN}/huggingface.svg`,
+            datasets: `${LOBE_CDN}/huggingface.svg`,
+            tokenizers: `${LOBE_CDN}/huggingface.svg`,
+            evaluate: `${LOBE_CDN}/huggingface.svg`,
+            hub: `${LOBE_CDN}/huggingface.svg`,
+            safetensors: `${LOBE_CDN}/huggingface.svg`,
+            optimum: `${LOBE_CDN}/huggingface.svg`,
+            sentence_transformers: `${LOBE_CDN}/huggingface.svg`,
+            autotrain: `${LOBE_CDN}/huggingface.svg`,
+
+            // ============ DEEP LEARNING ============
+            pytorch: `${SIMPLE_CDN}/pytorch`,
+            tensorflow: `${SIMPLE_CDN}/tensorflow`,
+            jax: `${LOBE_CDN}/google.svg`,
+            keras: `${SIMPLE_CDN}/keras`,
+            mxnet: `${SIMPLE_CDN}/apache`,
+            paddle: `${LOBE_CDN}/baidu.svg`,
+            lightning: `${SIMPLE_CDN}/lightning`,
+            torchvision: `${SIMPLE_CDN}/pytorch`,
+            torchaudio: `${SIMPLE_CDN}/pytorch`,
+            deepspeed: `${LOBE_CDN}/microsoft.svg`,
+            flax: `${LOBE_CDN}/google.svg`,
+            haiku: `${LOBE_CDN}/deepmind.svg`,
+            equinox: `${LOBE_CDN}/google.svg`,
+            optax: `${LOBE_CDN}/google.svg`,
+
+            // ============ FINE-TUNING ============
+            axolotl: `${LOBE_CDN}/axolotl.svg`,
+            unsloth: `${LOBE_CDN}/unsloth.svg`,
+            llamafactory: `${LOBE_CDN}/meta.svg`,
+            torchtune: `${SIMPLE_CDN}/pytorch`,
+            xturing: `${LOBE_CDN}/stochastic.svg`,
+            openllm: `${LOBE_CDN}/bentoml.svg`,
+            lora: `${LOBE_CDN}/huggingface.svg`,
+            qlora: `${LOBE_CDN}/huggingface.svg`,
+            dpo: `${LOBE_CDN}/huggingface.svg`,
+            rlhf: `${LOBE_CDN}/huggingface.svg`,
+
+            // ============ MODEL SERVING ============
+            vllm: `${LOBE_CDN}/vllm.svg`,
+            tgi: `${LOBE_CDN}/huggingface.svg`,
+            llamacpp: `${LOBE_CDN}/llamacpp.svg`,
+            sglang: `${LOBE_CDN}/sglang.svg`,
+            triton: `${SIMPLE_CDN}/nvidia`,
+            tensorrt: `${SIMPLE_CDN}/nvidia`,
+            mlx: `${SIMPLE_CDN}/apple`,
+            exllama: `${LOBE_CDN}/exllama.svg`,
+            bentoml: `${LOBE_CDN}/bentoml.svg`,
+            rayserve: `${LOBE_CDN}/ray.svg`,
+
+            // ============ VECTOR DATABASES ============
+            chroma: `${LOBE_CDN}/chroma.svg`,
+            pinecone: `${LOBE_CDN}/pinecone.svg`,
+            weaviate: `${LOBE_CDN}/weaviate.svg`,
+            qdrant: `${LOBE_CDN}/qdrant.svg`,
+            milvus: `${LOBE_CDN}/milvus.svg`,
+            faiss: `${LOBE_CDN}/meta.svg`,
+            pgvector: `${SIMPLE_CDN}/postgresql`,
+            neo4j: `${SIMPLE_CDN}/neo4j`,
+            lancedb: `${LOBE_CDN}/lancedb.svg`,
+            elasticsearch: `${SIMPLE_CDN}/elasticsearch`,
+            redis_vector: `${SIMPLE_CDN}/redis`,
+
+            // ============ AI MEMORY ============
+            mem0: `${LOBE_CDN}/mem0.svg`,
+            zep: `${LOBE_CDN}/zep.svg`,
+            motorhead: `${SIMPLE_CDN}/redis`,
+
+            // ============ OBSERVABILITY ============
+            langsmith: `${LOBE_CDN}/langsmith.svg`,
+            langfuse: `${LOBE_CDN}/langfuse.svg`,
+            phoenix: `${LOBE_CDN}/arize.svg`,
+            helicone: `${LOBE_CDN}/helicone.svg`,
+            wandb: `${LOBE_CDN}/wandb.svg`,
+            mlflow: `${SIMPLE_CDN}/mlflow`,
+            comet: `${LOBE_CDN}/cometml.svg`,
+            neptune: `${LOBE_CDN}/neptune.svg`,
+            braintrust: `${LOBE_CDN}/braintrust.svg`,
+            clearml: `${LOBE_CDN}/clearml.svg`,
+            dvc: `${SIMPLE_CDN}/dvc`,
+
+            // ============ PROMPT MANAGEMENT ============
+            promptlayer: `${LOBE_CDN}/promptlayer.svg`,
+            prompthub: `${SIMPLE_CDN}/git`,
+            promptfoo: `${LOBE_CDN}/promptfoo.svg`,
+            humanloop: `${LOBE_CDN}/humanloop.svg`,
+            agenta: `${LOBE_CDN}/agenta.svg`,
+
+            // ============ API GATEWAYS ============
+            litellm: `${LOBE_CDN}/litellm.svg`,
+            openrouter: `${LOBE_CDN}/openrouter.svg`,
+            portkey: `${LOBE_CDN}/portkey.svg`,
+            kong: `${SIMPLE_CDN}/kong`,
+            martian: `${LOBE_CDN}/martian.svg`,
+
+            // ============ GPU CLOUD ============
+            modal: `${LOBE_CDN}/modal.svg`,
+            runpod: `${LOBE_CDN}/runpod.svg`,
+            lambda: `${LOBE_CDN}/lambdalabs.svg`,
+            vastai: `${LOBE_CDN}/vastai.svg`,
+            coreweave: `${LOBE_CDN}/coreweave.svg`,
+            paperspace: `${LOBE_CDN}/paperspace.svg`,
+            anyscale: `${LOBE_CDN}/anyscale.svg`,
+            banana: `${LOBE_CDN}/banana.svg`,
+            baseten: `${LOBE_CDN}/baseten.svg`,
+            skypilot: `${LOBE_CDN}/skypilot.svg`,
+            lepton: `${LOBE_CDN}/lepton.svg`,
+            beam: `${LOBE_CDN}/beam.svg`,
+            fal: `${LOBE_CDN}/fal.svg`,
+            salad: `${LOBE_CDN}/salad.svg`,
+            brev: `${LOBE_CDN}/brev.svg`,
+
+            // ============ AI INTERFACES ============
+            gradio: `${LOBE_CDN}/gradio.svg`,
+            streamlit: `${LOBE_CDN}/streamlit.svg`,
+            chainlit: `${LOBE_CDN}/chainlit.svg`,
+            panel: `${SIMPLE_CDN}/holoviz`,
+            nicegui: `${LOBE_CDN}/nicegui.svg`,
+            mesop: `${LOBE_CDN}/google.svg`,
+            openwebui: `${LOBE_CDN}/openwebui.svg`,
+            librechat: `${LOBE_CDN}/librechat.svg`,
+
+            // ============ EVALUATION ============
+            ragas: `${LOBE_CDN}/ragas.svg`,
+            deepeval: `${LOBE_CDN}/deepeval.svg`,
+            trulens: `${LOBE_CDN}/trulens.svg`,
+            giskard: `${LOBE_CDN}/giskard.svg`,
+            uptrain: `${LOBE_CDN}/uptrain.svg`,
+            inspect: `${LOBE_CDN}/uk-aisi.svg`,
+            lmeval: `${LOBE_CDN}/eleutherai.svg`,
+
+            // ============ GUARDRAILS ============
+            nemo: `${SIMPLE_CDN}/nvidia`,
+            guardrails: `${LOBE_CDN}/guardrailsai.svg`,
+            lakera: `${LOBE_CDN}/lakera.svg`,
+            rebuff: `${SIMPLE_CDN}/shield`,
+            llmguard: `${SIMPLE_CDN}/shield`,
+
+            // ============ DOCUMENT PROCESSING ============
+            unstructured: `${LOBE_CDN}/unstructured.svg`,
+            llamaparse: `${LOBE_CDN}/llamaindex.svg`,
+            pymupdf: `${SIMPLE_CDN}/readthedocs`,
+            pdfplumber: `${SIMPLE_CDN}/readthedocs`,
+            docling: `${LOBE_CDN}/ibm.svg`,
+            marker: `${SIMPLE_CDN}/markdown`,
+            tesseract: `${SIMPLE_CDN}/google`,
+            paddleocr: `${LOBE_CDN}/baidu.svg`,
+            easyocr: `${SIMPLE_CDN}/opencv`,
+            surya: `${SIMPLE_CDN}/opencv`,
+
+            // ============ MCP ECOSYSTEM ============
+            mcp_python: `${LOBE_CDN}/mcp.svg`,
+            mcp_ts: `${SIMPLE_CDN}/typescript`,
+            fastmcp: `${LOBE_CDN}/mcp.svg`,
+            mcp_github: `${SIMPLE_CDN}/github`,
+            mcp_gitlab: `${SIMPLE_CDN}/gitlab`,
+            mcp_filesystem: `${SIMPLE_CDN}/files`,
+            mcp_memory: `${SIMPLE_CDN}/databricks`,
+            mcp_postgres: `${SIMPLE_CDN}/postgresql`,
+            mcp_puppeteer: `${SIMPLE_CDN}/puppeteer`,
+            mcp_slack: `${SIMPLE_CDN}/slack`,
+            mcp_gdrive: `${SIMPLE_CDN}/googledrive`,
+            mcp_notion: `${SIMPLE_CDN}/notion`,
+            mcp_aws: `${LOBE_CDN}/aws.svg`,
+            mcp_azure: `${LOBE_CDN}/azure.svg`,
+            mcp_cloudflare: `${SIMPLE_CDN}/cloudflare`,
+            mcp_docker: `${SIMPLE_CDN}/docker`,
+            mcp_sequential: `${LOBE_CDN}/mcp.svg`,
+            mcp_context7: `${LOBE_CDN}/mcp.svg`,
+
+            // ============ VISION MODELS ============
+            clip: `${LOBE_CDN}/openai.svg`,
+            blip: `${SIMPLE_CDN}/salesforce`,
+            sam: `${LOBE_CDN}/meta.svg`,
+            sam2: `${LOBE_CDN}/meta.svg`,
+            florence: `${LOBE_CDN}/microsoft.svg`,
+            llava: `${LOBE_CDN}/llava.svg`,
+            cogvlm: `${LOBE_CDN}/chatglm.svg`,
+            qwenvl: `${LOBE_CDN}/qwen.svg`,
+
+            // ============ AUDIO MODELS ============
+            whisper: `${LOBE_CDN}/openai.svg`,
+            faster_whisper: `${LOBE_CDN}/openai.svg`,
+            bark: `${LOBE_CDN}/suno.svg`,
+            tortoise: `${SIMPLE_CDN}/audacity`,
+            coqui: `${LOBE_CDN}/coqui.svg`,
+            whisperx: `${LOBE_CDN}/openai.svg`,
+            audiocraft: `${LOBE_CDN}/meta.svg`,
+            elevenlabs: `${LOBE_CDN}/elevenlabs.svg`,
+            assemblyai: `${LOBE_CDN}/assemblyai.svg`,
+            deepgram: `${LOBE_CDN}/deepgram.svg`,
+            playht: `${LOBE_CDN}/playht.svg`,
+            resemble: `${LOBE_CDN}/resemble.svg`,
+
+            // ============ IMAGE GENERATION ============
+            sd: `${LOBE_CDN}/stability.svg`,
+            sdxl: `${LOBE_CDN}/stability.svg`,
+            flux: `${LOBE_CDN}/flux.svg`,
+            dalle: `${LOBE_CDN}/openai.svg`,
+            controlnet: `${LOBE_CDN}/stability.svg`,
+            midjourney: `${LOBE_CDN}/midjourney.svg`,
+            ideogram: `${LOBE_CDN}/ideogram.svg`,
+
+            // ============ DATA LABELING ============
+            labelstudio: `${LOBE_CDN}/labelstudio.svg`,
+            labelbox: `${LOBE_CDN}/labelbox.svg`,
+            snorkel: `${LOBE_CDN}/snorkel.svg`,
+            argilla: `${LOBE_CDN}/argilla.svg`,
+            prodigy: `${LOBE_CDN}/spacy.svg`,
+            cvat: `${SIMPLE_CDN}/opencv`,
+            roboflow: `${LOBE_CDN}/roboflow.svg`,
+            scaleai: `${LOBE_CDN}/scale.svg`,
+
+            // ============ CODE ASSISTANTS ============
+            copilot: `${LOBE_CDN}/githubcopilot.svg`,
+            cursor: `${LOBE_CDN}/cursor.svg`,
+            windsurf: `${LOBE_CDN}/codeium.svg`,
+            codeium: `${LOBE_CDN}/codeium.svg`,
+            tabnine: `${LOBE_CDN}/tabnine.svg`,
+            amazonq: `${LOBE_CDN}/aws.svg`,
+            aider: `${LOBE_CDN}/aider.svg`,
+            "continue": `${LOBE_CDN}/continue.svg`,
+            cody: `${LOBE_CDN}/sourcegraph.svg`,
+
+            // ============ RESEARCH TOOLS ============
+            notebooklm: `${LOBE_CDN}/google.svg`,
+            perplexity_search: `${LOBE_CDN}/perplexity.svg`,
+            consensus: `${SIMPLE_CDN}/semanticscholar`,
+            elicit: `${SIMPLE_CDN}/semanticscholar`,
+
+            // ============ CLOUD PLATFORMS ============
+            sagemaker: `${LOBE_CDN}/aws.svg`,
+            vertex: `${LOBE_CDN}/google.svg`,
+            azureml: `${LOBE_CDN}/azure.svg`,
+            databricks: `${SIMPLE_CDN}/databricks`,
+            snowflake: `${SIMPLE_CDN}/snowflake`,
+            h2o: `${LOBE_CDN}/h2o.svg`,
+            datarobot: `${LOBE_CDN}/datarobot.svg`,
+
+            // ============ AI COMMUNICATION ============
+            twilio: `${SIMPLE_CDN}/twilio`,
+            vonage: `${SIMPLE_CDN}/vonage`,
+            livekit: `${LOBE_CDN}/livekit.svg`,
+            daily: `${LOBE_CDN}/daily.svg`,
+            agora: `${SIMPLE_CDN}/agora`,
+            vapi: `${LOBE_CDN}/vapi.svg`,
+            bland: `${SIMPLE_CDN}/twilio`,
+            retell: `${LOBE_CDN}/retell.svg`,
+
+            // ============ VIDEO AI ============
+            runway: `${LOBE_CDN}/runway.svg`,
+            pika: `${LOBE_CDN}/pika.svg`,
+            heygen: `${LOBE_CDN}/heygen.svg`,
+            synthesia: `${LOBE_CDN}/synthesia.svg`,
+            descript: `${LOBE_CDN}/descript.svg`,
+            luma: `${LOBE_CDN}/lumalabs.svg`,
+            kling: `${LOBE_CDN}/kling.svg`,
+            sora: `${LOBE_CDN}/openai.svg`,
+
+            // ============ STARTUP ICONS ============
+            // LLM Orchestration
+            parea: `${LOBE_CDN}/parea.svg`,
+            lamini: `${LOBE_CDN}/lamini.svg`,
+            vellum: `${LOBE_CDN}/vellum.svg`,
+            keywords: `${LOBE_CDN}/keywordsai.svg`,
+
+            // Agents
+            e2b: `${LOBE_CDN}/e2b.svg`,
+            composio: `${LOBE_CDN}/composio.svg`,
+            browseruse: `${LOBE_CDN}/browseruse.svg`,
+            agentql: `${LOBE_CDN}/agentql.svg`,
+            multion: `${LOBE_CDN}/multion.svg`,
+            fixie: `${LOBE_CDN}/fixie.svg`,
+
+            // Fine-tuning
+            predibase: `${LOBE_CDN}/predibase.svg`,
+            openpipe: `${LOBE_CDN}/openpipe.svg`,
+            anyscale_ft: `${LOBE_CDN}/anyscale.svg`,
+
+            // Observability
+            opik: `${LOBE_CDN}/cometml.svg`,
+            lunary: `${LOBE_CDN}/lunary.svg`,
+            pydantic_logfire: `${LOBE_CDN}/pydantic.svg`,
+            langtrace: `${LOBE_CDN}/langtrace.svg`,
+            athina: `${LOBE_CDN}/athina.svg`,
+
+            // Vector DBs
+            turbopuffer: `${LOBE_CDN}/turbopuffer.svg`,
+            marqo: `${LOBE_CDN}/marqo.svg`,
+            vespa: `${LOBE_CDN}/vespa.svg`,
+
+            // Memory
+            cognee: `${LOBE_CDN}/cognee.svg`,
+            graphiti: `${LOBE_CDN}/zep.svg`,
+
+            // Guardrails
+            promptarmor: `${SIMPLE_CDN}/shield`,
+            vigil: `${SIMPLE_CDN}/shield`,
+            whylabs: `${LOBE_CDN}/whylabs.svg`,
+
+            // Code Assistants
+            sweep: `${LOBE_CDN}/sweep.svg`,
+            mentat: `${LOBE_CDN}/mentat.svg`,
+            codegen: `${LOBE_CDN}/codegen.svg`,
+            supermaven: `${LOBE_CDN}/supermaven.svg`,
+            coderabbit: `${LOBE_CDN}/coderabbit.svg`,
+
+            // GPU Cloud
+            shadeform: `${LOBE_CDN}/shadeform.svg`,
+            fluidstack: `${LOBE_CDN}/fluidstack.svg`,
+            tensordock: `${LOBE_CDN}/tensordock.svg`,
+            hyperstack: `${SIMPLE_CDN}/nvidia`,
+
+            // Communication
+            hume: `${LOBE_CDN}/hume.svg`,
+            cartesia: `${LOBE_CDN}/cartesia.svg`,
+            speechmatics: `${LOBE_CDN}/speechmatics.svg`,
+
+            // Document Processing
+            zerox: `${LOBE_CDN}/zerox.svg`,
+            reducto: `${LOBE_CDN}/reducto.svg`,
+            docsumo: `${LOBE_CDN}/docsumo.svg`,
+
+            // Evaluation
+            baserun: `${LOBE_CDN}/baserun.svg`,
+            freeplay: `${LOBE_CDN}/freeplay.svg`,
+            autoblocks: `${LOBE_CDN}/autoblocks.svg`,
+
+            // Visual Builders
+            stack: `${LOBE_CDN}/stackai.svg`,
+            vectorshift: `${LOBE_CDN}/vectorshift.svg`,
+            voiceflow: `${LOBE_CDN}/voiceflow.svg`,
+
+            // API Gateway
+            unify: `${LOBE_CDN}/unify.svg`,
+            notdiamond: `${LOBE_CDN}/notdiamond.svg`,
+
+            // Model Serving
+            inferless: `${LOBE_CDN}/inferless.svg`,
+            cerebrium: `${LOBE_CDN}/cerebrium.svg`,
+            mystic: `${LOBE_CDN}/mystic.svg`,
+            twelve_labs: `${LOBE_CDN}/twelvelabs.svg`,
+        };
+
+        const data = {
+            nodes: [
+                // ROOT
+                { id: "root", name: "AI Infrastructure", type: "Root", desc: "Complete AI/ML tools ecosystem" },
+
+                // ========== CATEGORIES ==========
+                { id: "cat_dl", name: "Deep Learning", type: "Category", desc: "Core neural network frameworks" },
+                { id: "cat_llm", name: "LLM Orchestration", type: "Category", desc: "Frameworks for building LLM apps" },
+                { id: "cat_agents", name: "Agent Frameworks", type: "Category", desc: "Multi-agent systems" },
+                { id: "cat_visual", name: "Visual Builders", type: "Category", desc: "No-code/low-code AI tools" },
+                { id: "cat_workflow", name: "Workflow Orchestration", type: "Category", desc: "Pipeline management" },
+                { id: "cat_providers", name: "Model Providers", type: "Category", desc: "LLM API providers" },
+                { id: "cat_hf", name: "HuggingFace", type: "Category", desc: "Open-source ML ecosystem" },
+                { id: "cat_finetune", name: "Fine-Tuning", type: "Category", desc: "Model customization" },
+                { id: "cat_serving", name: "Model Serving", type: "Category", desc: "Inference & deployment" },
+                { id: "cat_vectordb", name: "Vector Databases", type: "Category", desc: "Embedding storage" },
+                { id: "cat_memory", name: "AI Memory", type: "Category", desc: "Agent memory systems" },
+                { id: "cat_observability", name: "Observability", type: "Category", desc: "Monitoring & tracing" },
+                { id: "cat_prompts", name: "Prompt Management", type: "Category", desc: "Prompt versioning" },
+                { id: "cat_gateway", name: "API Gateways", type: "Category", desc: "LLM API management" },
+                { id: "cat_gpu", name: "GPU Cloud", type: "Category", desc: "Compute infrastructure" },
+                { id: "cat_ui", name: "AI Interfaces", type: "Category", desc: "Frontend frameworks" },
+                { id: "cat_eval", name: "Evaluation", type: "Category", desc: "Testing & benchmarks" },
+                { id: "cat_safety", name: "Guardrails", type: "Category", desc: "AI safety tools" },
+                { id: "cat_docs", name: "Document Processing", type: "Category", desc: "PDF, OCR, parsing" },
+                { id: "cat_mcp", name: "MCP Ecosystem", type: "Category", desc: "Model Context Protocol" },
+                { id: "cat_multimodal", name: "Multimodal", type: "Category", desc: "Vision, audio, video" },
+                { id: "cat_labeling", name: "Data Labeling", type: "Category", desc: "Annotation tools" },
+                { id: "cat_code", name: "Code Assistants", type: "Category", desc: "AI coding tools" },
+                { id: "cat_research", name: "Research Tools", type: "Category", desc: "Knowledge management" },
+                { id: "cat_cloud", name: "Cloud Platforms", type: "Category", desc: "Managed ML services" },
+                { id: "cat_comm", name: "AI Communication", type: "Category", desc: "Voice, SMS, real-time" },
+                { id: "cat_video", name: "Video AI", type: "Category", desc: "Video generation" },
+
+                // ========== SUBCATEGORIES ==========
+                { id: "sub_pytorch", name: "PyTorch Ecosystem", type: "Subcategory", parent: "cat_dl" },
+                { id: "sub_jax", name: "JAX Ecosystem", type: "Subcategory", parent: "cat_dl" },
+                { id: "sub_vision", name: "Vision Models", type: "Subcategory", parent: "cat_multimodal" },
+                { id: "sub_audio", name: "Audio Models", type: "Subcategory", parent: "cat_multimodal" },
+                { id: "sub_imagegen", name: "Image Generation", type: "Subcategory", parent: "cat_multimodal" },
+                { id: "sub_mcp_sdk", name: "MCP SDKs", type: "Subcategory", parent: "cat_mcp" },
+                { id: "sub_mcp_servers", name: "MCP Servers", type: "Subcategory", parent: "cat_mcp" },
+                { id: "sub_finetune_tools", name: "Fine-Tune Tools", type: "Subcategory", parent: "cat_finetune" },
+                { id: "sub_finetune_tech", name: "Techniques", type: "Subcategory", parent: "cat_finetune" },
+
+                // ========== TOOLS WITH URLs AND SIZES ==========
+
+                // Deep Learning - Core
+                { id: "t_pytorch", name: "PyTorch", type: "Tool", parent: "cat_dl", detection: "torch", desc: "Meta's dominant DL framework", tags: ["training"], size: "large", url: "https://pytorch.org", icon: "pytorch" },
+                { id: "t_tensorflow", name: "TensorFlow", type: "Tool", parent: "cat_dl", detection: "tensorflow", desc: "Google's production framework", tags: ["training"], size: "large", url: "https://tensorflow.org", icon: "tensorflow" },
+                { id: "t_jax", name: "JAX", type: "Tool", parent: "cat_dl", detection: "jax", desc: "High-performance numerical computing", tags: ["training"], size: "large", url: "https://github.com/google/jax", icon: "jax" },
+                { id: "t_keras", name: "Keras", type: "Tool", parent: "cat_dl", detection: "keras", desc: "High-level multi-backend API", tags: ["training"], size: "large", url: "https://keras.io", icon: "keras" },
+                { id: "t_mxnet", name: "MXNet", type: "Tool", parent: "cat_dl", detection: "mxnet", desc: "Apache deep learning", tags: ["training"], size: "medium", url: "https://mxnet.apache.org" },
+                { id: "t_paddle", name: "PaddlePaddle", type: "Tool", parent: "cat_dl", detection: "paddle", desc: "Baidu's DL platform", tags: ["training"], size: "large", url: "https://www.paddlepaddle.org.cn" },
+
+                // PyTorch Ecosystem
+                { id: "t_lightning", name: "PyTorch Lightning", type: "Tool", parent: "sub_pytorch", detection: "lightning", desc: "High-level PyTorch wrapper", tags: ["training"], size: "medium", url: "https://lightning.ai", icon: "lightning" },
+                { id: "t_torchvision", name: "TorchVision", type: "Tool", parent: "sub_pytorch", detection: "torchvision", desc: "Computer vision models", tags: ["training", "multimodal"], size: "large", url: "https://pytorch.org/vision" },
+                { id: "t_torchaudio", name: "TorchAudio", type: "Tool", parent: "sub_pytorch", detection: "torchaudio", desc: "Audio processing", tags: ["training", "multimodal"], size: "medium", url: "https://pytorch.org/audio" },
+                { id: "t_deepspeed", name: "DeepSpeed", type: "Tool", parent: "sub_pytorch", detection: "deepspeed", desc: "Microsoft distributed training", tags: ["training", "infra"], size: "large", url: "https://www.deepspeed.ai" },
+
+                // JAX Ecosystem
+                { id: "t_flax", name: "Flax", type: "Tool", parent: "sub_jax", detection: "flax", desc: "Google's neural network library", tags: ["training"], size: "medium", url: "https://flax.readthedocs.io" },
+                { id: "t_haiku", name: "Haiku", type: "Tool", parent: "sub_jax", detection: "dm-haiku", desc: "DeepMind's NN library", tags: ["training"], size: "medium", url: "https://dm-haiku.readthedocs.io" },
+                { id: "t_equinox", name: "Equinox", type: "Tool", parent: "sub_jax", detection: "equinox", desc: "Elegant JAX neural networks", tags: ["training"], size: "small", url: "https://docs.kidger.site/equinox" },
+                { id: "t_optax", name: "Optax", type: "Tool", parent: "sub_jax", detection: "optax", desc: "Gradient optimization", tags: ["training"], size: "medium", url: "https://optax.readthedocs.io" },
+
+                // LLM Orchestration
+                { id: "t_langchain", name: "LangChain", type: "Tool", parent: "cat_llm", detection: "langchain", desc: "Most adopted LLM framework", tags: ["llm"], size: "large", url: "https://langchain.com" },
+                { id: "t_llamaindex", name: "LlamaIndex", type: "Tool", parent: "cat_llm", detection: "llama-index", desc: "Data connector & indexing", tags: ["llm", "data"], size: "medium", url: "https://llamaindex.ai" },
+                { id: "t_haystack", name: "Haystack", type: "Tool", parent: "cat_llm", detection: "haystack-ai", desc: "End-to-end NLP framework", tags: ["llm"], size: "medium", url: "https://haystack.deepset.ai" },
+                { id: "t_dspy", name: "DSPy", type: "Tool", parent: "cat_llm", detection: "dspy", desc: "Programming framework for LLMs", tags: ["llm"], size: "small", url: "https://dspy-docs.vercel.app" },
+                { id: "t_semantic", name: "Semantic Kernel", type: "Tool", parent: "cat_llm", detection: "semantic-kernel", desc: "Microsoft's LLM orchestration", tags: ["llm"], size: "large", url: "https://learn.microsoft.com/semantic-kernel" },
+                { id: "t_mirascope", name: "Mirascope", type: "Tool", parent: "cat_llm", detection: "mirascope", desc: "Pythonic LLM toolkit", tags: ["llm"], size: "tiny", url: "https://mirascope.io" },
+                { id: "t_marvin", name: "Marvin", type: "Tool", parent: "cat_llm", detection: "marvin", desc: "AI functions for Python", tags: ["llm"], size: "small", url: "https://askmarvin.ai" },
+                { id: "t_magentic", name: "Magentic", type: "Tool", parent: "cat_llm", detection: "magentic", desc: "LLM function calling", tags: ["llm"], size: "tiny", url: "https://magentic.dev" },
+
+                // Agent Frameworks
+                { id: "t_langgraph", name: "LangGraph", type: "Tool", parent: "cat_agents", detection: "langgraph", desc: "Stateful multi-actor agents", tags: ["llm"], size: "medium", url: "https://langchain-ai.github.io/langgraph" },
+                { id: "t_crewai", name: "CrewAI", type: "Tool", parent: "cat_agents", detection: "crewai", desc: "Role-based multi-agent", tags: ["llm"], size: "small", url: "https://crewai.com" },
+                { id: "t_autogen", name: "AutoGen", type: "Tool", parent: "cat_agents", detection: "autogen", desc: "Microsoft multi-agent", tags: ["llm"], size: "large", url: "https://microsoft.github.io/autogen" },
+                { id: "t_pydantic_ai", name: "Pydantic AI", type: "Tool", parent: "cat_agents", detection: "pydantic-ai", desc: "Type-safe agents", tags: ["llm"], size: "small", url: "https://ai.pydantic.dev" },
+                { id: "t_instructor", name: "Instructor", type: "Tool", parent: "cat_agents", detection: "instructor", desc: "Structured LLM outputs", tags: ["llm"], size: "small", url: "https://python.useinstructor.com" },
+                { id: "t_guidance", name: "Guidance", type: "Tool", parent: "cat_agents", detection: "guidance", desc: "Constrained generation", tags: ["llm"], size: "medium", url: "https://github.com/guidance-ai/guidance" },
+                { id: "t_outlines", name: "Outlines", type: "Tool", parent: "cat_agents", detection: "outlines", desc: "Structured generation", tags: ["llm"], size: "small", url: "https://outlines-dev.github.io/outlines" },
+                { id: "t_lmql", name: "LMQL", type: "Tool", parent: "cat_agents", detection: "lmql", desc: "Query language for LLMs", tags: ["llm"], size: "tiny", url: "https://lmql.ai" },
+                { id: "t_smolagents", name: "smolagents", type: "Tool", parent: "cat_agents", detection: "smolagents", desc: "HuggingFace agents", tags: ["llm"], size: "medium", url: "https://huggingface.co/docs/smolagents" },
+                { id: "t_letta", name: "Letta (MemGPT)", type: "Tool", parent: "cat_agents", detection: "letta", desc: "Stateful agents with memory", tags: ["llm"], size: "small", url: "https://letta.com" },
+                { id: "t_agentops", name: "AgentOps", type: "Tool", parent: "cat_agents", detection: "agentops", desc: "Agent observability", tags: ["llm", "observability"], size: "tiny", url: "https://agentops.ai" },
+
+                // Visual Builders
+                { id: "t_langflow", name: "LangFlow", type: "Tool", parent: "cat_visual", detection: "langflow", desc: "Visual LangChain builder", tags: ["llm"], size: "small", url: "https://langflow.org" },
+                { id: "t_flowise", name: "Flowise", type: "Tool", parent: "cat_visual", detection: "flowise", desc: "Drag & drop LLM flows", tags: ["llm"], size: "small", url: "https://flowiseai.com" },
+                { id: "t_n8n", name: "n8n", type: "Tool", parent: "cat_visual", detection: "n8n", desc: "Workflow automation", tags: ["llm", "infra"], size: "medium", url: "https://n8n.io" },
+                { id: "t_dify", name: "Dify", type: "Tool", parent: "cat_visual", detection: "dify", desc: "LLMOps platform", tags: ["llm"], size: "medium", url: "https://dify.ai" },
+                { id: "t_rivet", name: "Rivet", type: "Tool", parent: "cat_visual", detection: "rivet", desc: "Visual AI agent builder", tags: ["llm"], size: "tiny", url: "https://rivet.ironcladapp.com" },
+                { id: "t_comfyui", name: "ComfyUI", type: "Tool", parent: "cat_visual", detection: "comfyui", desc: "Stable Diffusion workflow", tags: ["multimodal"], size: "small", url: "https://github.com/comfyanonymous/ComfyUI" },
+
+                // Workflow Orchestration
+                { id: "t_temporal", name: "Temporal", type: "Tool", parent: "cat_workflow", detection: "temporalio", desc: "Durable execution platform", tags: ["infra"], size: "large", url: "https://temporal.io" },
+                { id: "t_prefect", name: "Prefect", type: "Tool", parent: "cat_workflow", detection: "prefect", desc: "Modern workflow orchestration", tags: ["infra"], size: "medium", url: "https://prefect.io" },
+                { id: "t_airflow", name: "Airflow", type: "Tool", parent: "cat_workflow", detection: "apache-airflow", desc: "Data pipeline orchestration", tags: ["infra"], size: "large", url: "https://airflow.apache.org" },
+                { id: "t_dagster", name: "Dagster", type: "Tool", parent: "cat_workflow", detection: "dagster", desc: "Data orchestration platform", tags: ["infra"], size: "medium", url: "https://dagster.io" },
+                { id: "t_inngest", name: "Inngest", type: "Tool", parent: "cat_workflow", detection: "inngest", desc: "Event-driven workflows", tags: ["infra"], size: "small", url: "https://inngest.com" },
+                { id: "t_celery", name: "Celery", type: "Tool", parent: "cat_workflow", detection: "celery", desc: "Distributed task queue", tags: ["infra"], size: "medium", url: "https://docs.celeryq.dev" },
+                { id: "t_ray", name: "Ray", type: "Tool", parent: "cat_workflow", detection: "ray", desc: "Distributed computing", tags: ["infra", "training"], size: "large", url: "https://ray.io" },
+                { id: "t_metaflow", name: "Metaflow", type: "Tool", parent: "cat_workflow", detection: "metaflow", desc: "Netflix ML workflow", tags: ["infra"], size: "medium", url: "https://metaflow.org" },
+                { id: "t_kubeflow", name: "Kubeflow", type: "Tool", parent: "cat_workflow", detection: "kubeflow", desc: "ML pipelines on K8s", tags: ["infra"], size: "large", url: "https://kubeflow.org" },
+                { id: "t_flyte", name: "Flyte", type: "Tool", parent: "cat_workflow", detection: "flytekit", desc: "ML workflow platform", tags: ["infra"], size: "medium", url: "https://flyte.org" },
+                { id: "t_zenml", name: "ZenML", type: "Tool", parent: "cat_workflow", detection: "zenml", desc: "MLOps framework", tags: ["infra", "observability"], size: "small", url: "https://zenml.io" },
+
+                // Model Providers
+                { id: "t_openai", name: "OpenAI", type: "Tool", parent: "cat_providers", detection: "openai", desc: "GPT-4o, o1, o3, DALL-E", tags: ["llm"], size: "large", url: "https://openai.com" },
+                { id: "t_anthropic", name: "Anthropic", type: "Tool", parent: "cat_providers", detection: "anthropic", desc: "Claude 3.5, Claude 4", tags: ["llm"], size: "large", url: "https://anthropic.com" },
+                { id: "t_google_ai", name: "Google AI", type: "Tool", parent: "cat_providers", detection: "google-generativeai", desc: "Gemini 2.0, PaLM", tags: ["llm"], size: "large", url: "https://ai.google.dev" },
+                { id: "t_mistral", name: "Mistral", type: "Tool", parent: "cat_providers", detection: "mistralai", desc: "Mistral Large, Mixtral", tags: ["llm"], size: "large", url: "https://mistral.ai" },
+                { id: "t_cohere", name: "Cohere", type: "Tool", parent: "cat_providers", detection: "cohere", desc: "Command R+, Embed", tags: ["llm"], size: "medium", url: "https://cohere.com" },
+                { id: "t_groq", name: "Groq", type: "Tool", parent: "cat_providers", detection: "groq", desc: "Fast LPU inference", tags: ["llm", "infra"], size: "medium", url: "https://groq.com" },
+                { id: "t_together", name: "Together AI", type: "Tool", parent: "cat_providers", detection: "together", desc: "Open source models", tags: ["llm"], size: "medium", url: "https://together.ai" },
+                { id: "t_fireworks", name: "Fireworks AI", type: "Tool", parent: "cat_providers", detection: "fireworks-ai", desc: "Fast inference", tags: ["llm", "infra"], size: "medium", url: "https://fireworks.ai" },
+                { id: "t_replicate", name: "Replicate", type: "Tool", parent: "cat_providers", detection: "replicate", desc: "Model hosting", tags: ["llm", "infra"], size: "medium", url: "https://replicate.com" },
+                { id: "t_bedrock", name: "AWS Bedrock", type: "Tool", parent: "cat_providers", detection: "bedrock", desc: "Multi-provider on AWS", tags: ["llm", "infra"], size: "large", url: "https://aws.amazon.com/bedrock" },
+                { id: "t_deepseek", name: "DeepSeek", type: "Tool", parent: "cat_providers", detection: "deepseek", desc: "DeepSeek-V3, R1", tags: ["llm"], size: "medium", url: "https://deepseek.com" },
+                { id: "t_qwen", name: "Qwen", type: "Tool", parent: "cat_providers", detection: "dashscope", desc: "Alibaba's Qwen models", tags: ["llm"], size: "large", url: "https://qwenlm.github.io" },
+                { id: "t_xai", name: "xAI", type: "Tool", parent: "cat_providers", detection: "xai-sdk", desc: "Grok models", tags: ["llm"], size: "large", url: "https://x.ai" },
+                { id: "t_perplexity", name: "Perplexity", type: "Tool", parent: "cat_providers", detection: "perplexity", desc: "Search-augmented LLMs", tags: ["llm"], size: "large", url: "https://perplexity.ai" },
+
+                // HuggingFace
+                { id: "t_transformers", name: "Transformers", type: "Tool", parent: "cat_hf", detection: "transformers", desc: "Model architecture library", tags: ["training", "llm"], size: "large", url: "https://huggingface.co/transformers" },
+                { id: "t_diffusers", name: "Diffusers", type: "Tool", parent: "cat_hf", detection: "diffusers", desc: "Diffusion models", tags: ["training", "multimodal"], size: "large", url: "https://huggingface.co/diffusers" },
+                { id: "t_accelerate", name: "Accelerate", type: "Tool", parent: "cat_hf", detection: "accelerate", desc: "Distributed training", tags: ["training"], size: "medium", url: "https://huggingface.co/accelerate" },
+                { id: "t_peft", name: "PEFT", type: "Tool", parent: "cat_hf", detection: "peft", desc: "Parameter-efficient fine-tuning", tags: ["training"], size: "medium", url: "https://huggingface.co/peft" },
+                { id: "t_trl", name: "TRL", type: "Tool", parent: "cat_hf", detection: "trl", desc: "Transformer RL training", tags: ["training"], size: "medium", url: "https://huggingface.co/trl" },
+                { id: "t_datasets", name: "Datasets", type: "Tool", parent: "cat_hf", detection: "datasets", desc: "Dataset loading/processing", tags: ["data"], size: "large", url: "https://huggingface.co/datasets" },
+                { id: "t_tokenizers", name: "Tokenizers", type: "Tool", parent: "cat_hf", detection: "tokenizers", desc: "Fast tokenization", tags: ["training"], size: "medium", url: "https://huggingface.co/tokenizers" },
+                { id: "t_evaluate", name: "Evaluate", type: "Tool", parent: "cat_hf", detection: "evaluate", desc: "Model evaluation", tags: ["observability"], size: "small", url: "https://huggingface.co/evaluate" },
+                { id: "t_optimum", name: "Optimum", type: "Tool", parent: "cat_hf", detection: "optimum", desc: "Hardware optimization", tags: ["infra"], size: "small", url: "https://huggingface.co/optimum" },
+                { id: "t_hub", name: "HuggingFace Hub", type: "Tool", parent: "cat_hf", detection: "huggingface_hub", desc: "Model hub integration", tags: ["infra"], size: "large", url: "https://huggingface.co" },
+                { id: "t_sentence_transformers", name: "Sentence Transformers", type: "Tool", parent: "cat_hf", detection: "sentence-transformers", desc: "Embeddings", tags: ["llm", "data"], size: "medium", url: "https://sbert.net" },
+                { id: "t_safetensors", name: "SafeTensors", type: "Tool", parent: "cat_hf", detection: "safetensors", desc: "Safe model serialization", tags: ["infra"], size: "small", url: "https://huggingface.co/safetensors" },
+
+                // Fine-Tuning Tools
+                { id: "t_axolotl", name: "Axolotl", type: "Tool", parent: "sub_finetune_tools", detection: "axolotl", desc: "Flexible LLM fine-tuning", tags: ["training"], size: "small", url: "https://axolotl.ai" },
+                { id: "t_unsloth", name: "Unsloth", type: "Tool", parent: "sub_finetune_tools", detection: "unsloth", desc: "2-5x faster, 80% less memory", tags: ["training"], size: "small", url: "https://unsloth.ai" },
+                { id: "t_llamafactory", name: "LLaMA Factory", type: "Tool", parent: "sub_finetune_tools", detection: "llamafactory", desc: "100+ models, web UI", tags: ["training"], size: "small", url: "https://github.com/hiyouga/LLaMA-Factory" },
+                { id: "t_torchtune", name: "Torchtune", type: "Tool", parent: "sub_finetune_tools", detection: "torchtune", desc: "PyTorch-native fine-tuning", tags: ["training"], size: "medium", url: "https://pytorch.org/torchtune" },
+                { id: "t_xturing", name: "xTuring", type: "Tool", parent: "sub_finetune_tools", detection: "xturing", desc: "Limited hardware training", tags: ["training"], size: "tiny", url: "https://xturing.stochastic.ai" },
+                { id: "t_autotrain", name: "AutoTrain", type: "Tool", parent: "sub_finetune_tools", detection: "autotrain", desc: "HuggingFace auto-training", tags: ["training"], size: "medium", url: "https://huggingface.co/autotrain" },
+                { id: "t_openllm", name: "OpenLLM", type: "Tool", parent: "sub_finetune_tools", detection: "openllm", desc: "LLMs in production", tags: ["training", "infra"], size: "small", url: "https://github.com/bentoml/OpenLLM" },
+
+                // Fine-Tuning Techniques
+                { id: "t_lora", name: "LoRA", type: "Tool", parent: "sub_finetune_tech", detection: "lora", desc: "Low-Rank Adaptation", tags: ["training"], size: "large", url: "https://arxiv.org/abs/2106.09685" },
+                { id: "t_qlora", name: "QLoRA", type: "Tool", parent: "sub_finetune_tech", detection: "bitsandbytes", desc: "Quantized LoRA", tags: ["training"], size: "medium", url: "https://arxiv.org/abs/2305.14314" },
+                { id: "t_dpo", name: "DPO", type: "Tool", parent: "sub_finetune_tech", detection: "trl", desc: "Direct Preference Optimization", tags: ["training"], size: "medium", url: "https://arxiv.org/abs/2305.18290" },
+                { id: "t_rlhf", name: "RLHF", type: "Tool", parent: "sub_finetune_tech", detection: "rlhf", desc: "RL from Human Feedback", tags: ["training"], size: "large", url: "https://huggingface.co/blog/rlhf" },
+
+                // Model Serving
+                { id: "t_vllm", name: "vLLM", type: "Tool", parent: "cat_serving", detection: "vllm", desc: "High-throughput serving", tags: ["infra"], size: "medium", url: "https://vllm.ai" },
+                { id: "t_tgi", name: "TGI", type: "Tool", parent: "cat_serving", detection: "text-generation-inference", desc: "HuggingFace serving", tags: ["infra"], size: "medium", url: "https://huggingface.co/text-generation-inference" },
+                { id: "t_ollama", name: "Ollama", type: "Tool", parent: "cat_serving", detection: "ollama", desc: "Local model running", tags: ["infra", "llm"], size: "medium", url: "https://ollama.com" },
+                { id: "t_llamacpp", name: "llama.cpp", type: "Tool", parent: "cat_serving", detection: "llama-cpp-python", desc: "Efficient local inference", tags: ["infra"], size: "medium", url: "https://github.com/ggerganov/llama.cpp" },
+                { id: "t_sglang", name: "SGLang", type: "Tool", parent: "cat_serving", detection: "sglang", desc: "Fast structured generation", tags: ["infra"], size: "small", url: "https://github.com/sgl-project/sglang" },
+                { id: "t_triton", name: "Triton", type: "Tool", parent: "cat_serving", detection: "tritonclient", desc: "NVIDIA inference server", tags: ["infra"], size: "large", url: "https://developer.nvidia.com/triton-inference-server" },
+                { id: "t_tensorrt", name: "TensorRT-LLM", type: "Tool", parent: "cat_serving", detection: "tensorrt-llm", desc: "NVIDIA optimized inference", tags: ["infra"], size: "large", url: "https://nvidia.github.io/TensorRT-LLM" },
+                { id: "t_mlx", name: "MLX", type: "Tool", parent: "cat_serving", detection: "mlx", desc: "Apple Silicon ML", tags: ["infra"], size: "large", url: "https://ml-explore.github.io/mlx" },
+                { id: "t_exllama", name: "ExLlamaV2", type: "Tool", parent: "cat_serving", detection: "exllamav2", desc: "Fast quantized inference", tags: ["infra"], size: "small", url: "https://github.com/turboderp/exllamav2" },
+                { id: "t_bentoml", name: "BentoML", type: "Tool", parent: "cat_serving", detection: "bentoml", desc: "ML model serving", tags: ["infra"], size: "small", url: "https://bentoml.com" },
+                { id: "t_rayserve", name: "Ray Serve", type: "Tool", parent: "cat_serving", detection: "ray.serve", desc: "Scalable model serving", tags: ["infra"], size: "medium", url: "https://docs.ray.io/en/latest/serve" },
+
+                // Vector Databases
+                { id: "t_chroma", name: "Chroma", type: "Tool", parent: "cat_vectordb", detection: "chromadb", desc: "Embedded open-source", tags: ["data"], size: "medium", url: "https://trychroma.com" },
+                { id: "t_pinecone", name: "Pinecone", type: "Tool", parent: "cat_vectordb", detection: "pinecone-client", desc: "Cloud managed", tags: ["data"], size: "large", url: "https://pinecone.io" },
+                { id: "t_weaviate", name: "Weaviate", type: "Tool", parent: "cat_vectordb", detection: "weaviate-client", desc: "Self-hosted/Cloud", tags: ["data"], size: "medium", url: "https://weaviate.io" },
+                { id: "t_qdrant", name: "Qdrant", type: "Tool", parent: "cat_vectordb", detection: "qdrant-client", desc: "Self-hosted/Cloud", tags: ["data"], size: "medium", url: "https://qdrant.tech" },
+                { id: "t_milvus", name: "Milvus", type: "Tool", parent: "cat_vectordb", detection: "pymilvus", desc: "Self-hosted", tags: ["data"], size: "medium", url: "https://milvus.io" },
+                { id: "t_faiss", name: "FAISS", type: "Tool", parent: "cat_vectordb", detection: "faiss", desc: "Meta's local vectors", tags: ["data"], size: "large", url: "https://faiss.ai" },
+                { id: "t_pgvector", name: "PGVector", type: "Tool", parent: "cat_vectordb", detection: "pgvector", desc: "PostgreSQL extension", tags: ["data"], size: "medium", url: "https://github.com/pgvector/pgvector" },
+                { id: "t_neo4j", name: "Neo4j", type: "Tool", parent: "cat_vectordb", detection: "neo4j", desc: "Graph + Vector", tags: ["data"], size: "large", url: "https://neo4j.com" },
+                { id: "t_lancedb", name: "LanceDB", type: "Tool", parent: "cat_vectordb", detection: "lancedb", desc: "Embedded serverless", tags: ["data"], size: "small", url: "https://lancedb.com" },
+                { id: "t_elasticsearch", name: "Elasticsearch", type: "Tool", parent: "cat_vectordb", detection: "elasticsearch", desc: "Search + Vector", tags: ["data"], size: "large", url: "https://elastic.co" },
+                { id: "t_redis_vector", name: "Redis Vector", type: "Tool", parent: "cat_vectordb", detection: "redisvl", desc: "In-memory vector", tags: ["data"], size: "large", url: "https://redis.io/solutions/vector-search" },
+
+                // AI Memory
+                { id: "t_mem0", name: "Mem0", type: "Tool", parent: "cat_memory", detection: "mem0ai", desc: "Universal memory layer", tags: ["llm", "data"], size: "small", url: "https://mem0.ai" },
+                { id: "t_zep", name: "Zep", type: "Tool", parent: "cat_memory", detection: "zep", desc: "Temporal knowledge graph", tags: ["llm", "data"], size: "small", url: "https://getzep.com" },
+                { id: "t_motorhead", name: "Motorhead", type: "Tool", parent: "cat_memory", detection: "motorhead", desc: "Redis-backed memory", tags: ["llm", "data"], size: "tiny", url: "https://github.com/getmetal/motorhead" },
+
+                // Observability
+                { id: "t_langsmith", name: "LangSmith", type: "Tool", parent: "cat_observability", detection: "langsmith", desc: "LangChain observability", tags: ["observability", "llm"], size: "medium", url: "https://smith.langchain.com" },
+                { id: "t_langfuse", name: "Langfuse", type: "Tool", parent: "cat_observability", detection: "langfuse", desc: "Open-source LLM observability", tags: ["observability"], size: "small", url: "https://langfuse.com" },
+                { id: "t_phoenix", name: "Arize Phoenix", type: "Tool", parent: "cat_observability", detection: "arize-phoenix", desc: "LLM evaluation & tracing", tags: ["observability"], size: "medium", url: "https://phoenix.arize.com" },
+                { id: "t_helicone", name: "Helicone", type: "Tool", parent: "cat_observability", detection: "helicone", desc: "LLM proxy & logging", tags: ["observability"], size: "small", url: "https://helicone.ai" },
+                { id: "t_wandb", name: "Weights & Biases", type: "Tool", parent: "cat_observability", detection: "wandb", desc: "ML experiment tracking", tags: ["observability", "training"], size: "large", url: "https://wandb.ai" },
+                { id: "t_mlflow", name: "MLflow", type: "Tool", parent: "cat_observability", detection: "mlflow", desc: "ML lifecycle management", tags: ["observability"], size: "large", url: "https://mlflow.org" },
+                { id: "t_comet", name: "Comet", type: "Tool", parent: "cat_observability", detection: "comet-ml", desc: "ML experiment tracking", tags: ["observability"], size: "medium", url: "https://comet.com" },
+                { id: "t_neptune", name: "Neptune", type: "Tool", parent: "cat_observability", detection: "neptune", desc: "Metadata store", tags: ["observability"], size: "medium", url: "https://neptune.ai" },
+                { id: "t_braintrust", name: "Braintrust", type: "Tool", parent: "cat_observability", detection: "braintrust", desc: "AI evaluation platform", tags: ["observability"], size: "small", url: "https://braintrustdata.com" },
+                { id: "t_clearml", name: "ClearML", type: "Tool", parent: "cat_observability", detection: "clearml", desc: "MLOps platform", tags: ["observability", "infra"], size: "medium", url: "https://clear.ml" },
+                { id: "t_dvc", name: "DVC", type: "Tool", parent: "cat_observability", detection: "dvc", desc: "Data version control", tags: ["observability", "data"], size: "medium", url: "https://dvc.org" },
+
+                // Prompt Management
+                { id: "t_promptlayer", name: "PromptLayer", type: "Tool", parent: "cat_prompts", detection: "promptlayer", desc: "Prompt CMS & logging", tags: ["llm", "observability"], size: "small", url: "https://promptlayer.com" },
+                { id: "t_prompthub", name: "PromptHub", type: "Tool", parent: "cat_prompts", detection: "prompthub", desc: "Git-style versioning", tags: ["llm"], size: "tiny", url: "https://prompthub.us" },
+                { id: "t_promptfoo", name: "Promptfoo", type: "Tool", parent: "cat_prompts", detection: "promptfoo", desc: "CLI prompt testing", tags: ["llm", "observability"], size: "small", url: "https://promptfoo.dev" },
+                { id: "t_humanloop", name: "Humanloop", type: "Tool", parent: "cat_prompts", detection: "humanloop", desc: "Prompt optimization", tags: ["llm"], size: "small", url: "https://humanloop.com" },
+                { id: "t_agenta", name: "Agenta", type: "Tool", parent: "cat_prompts", detection: "agenta", desc: "Open-source prompts", tags: ["llm"], size: "tiny", url: "https://agenta.ai" },
+
+                // API Gateways
+                { id: "t_litellm", name: "LiteLLM", type: "Tool", parent: "cat_gateway", detection: "litellm", desc: "100+ LLM APIs in OpenAI format", tags: ["infra", "llm"], size: "small", url: "https://litellm.ai" },
+                { id: "t_openrouter", name: "OpenRouter", type: "Tool", parent: "cat_gateway", detection: "openrouter", desc: "Single API for providers", tags: ["infra", "llm"], size: "medium", url: "https://openrouter.ai" },
+                { id: "t_portkey", name: "Portkey", type: "Tool", parent: "cat_gateway", detection: "portkey-ai", desc: "AI gateway with guardrails", tags: ["infra", "llm"], size: "small", url: "https://portkey.ai" },
+                { id: "t_kong", name: "Kong AI Gateway", type: "Tool", parent: "cat_gateway", detection: "kong", desc: "Enterprise API gateway", tags: ["infra"], size: "large", url: "https://konghq.com" },
+                { id: "t_martian", name: "Martian", type: "Tool", parent: "cat_gateway", detection: "withmartian", desc: "Intelligent model router", tags: ["infra", "llm"], size: "small", url: "https://withmartian.com" },
+
+                // GPU Cloud
+                { id: "t_modal", name: "Modal", type: "Tool", parent: "cat_gpu", detection: "modal", desc: "Serverless GPU, sub-second cold starts", tags: ["infra"], size: "medium", url: "https://modal.com" },
+                { id: "t_runpod", name: "RunPod", type: "Tool", parent: "cat_gpu", detection: "runpod", desc: "GPU marketplace, pay-per-second", tags: ["infra"], size: "medium", url: "https://runpod.io" },
+                { id: "t_lambda", name: "Lambda Labs", type: "Tool", parent: "cat_gpu", detection: "lambda", desc: "GPU cloud, zero egress", tags: ["infra"], size: "medium", url: "https://lambdalabs.com" },
+                { id: "t_vastai", name: "Vast.ai", type: "Tool", parent: "cat_gpu", detection: "vastai", desc: "P2P GPU marketplace", tags: ["infra"], size: "small", url: "https://vast.ai" },
+                { id: "t_coreweave", name: "CoreWeave", type: "Tool", parent: "cat_gpu", detection: "coreweave", desc: "HPC-level, H100/H200/B200", tags: ["infra"], size: "large", url: "https://coreweave.com" },
+                { id: "t_paperspace", name: "Paperspace", type: "Tool", parent: "cat_gpu", detection: "gradient", desc: "GPU notebooks", tags: ["infra"], size: "medium", url: "https://paperspace.com" },
+                { id: "t_anyscale", name: "Anyscale", type: "Tool", parent: "cat_gpu", detection: "anyscale", desc: "Ray cloud platform", tags: ["infra"], size: "medium", url: "https://anyscale.com" },
+                { id: "t_banana", name: "Banana", type: "Tool", parent: "cat_gpu", detection: "banana-dev", desc: "ML inference hosting", tags: ["infra"], size: "small", url: "https://banana.dev" },
+                { id: "t_baseten", name: "Baseten", type: "Tool", parent: "cat_gpu", detection: "baseten", desc: "Model deployment", tags: ["infra"], size: "medium", url: "https://baseten.co" },
+                { id: "t_skypilot", name: "SkyPilot", type: "Tool", parent: "cat_gpu", detection: "skypilot", desc: "Multi-cloud ML", tags: ["infra"], size: "small", url: "https://skypilot.readthedocs.io" },
+                { id: "t_lepton", name: "Lepton AI", type: "Tool", parent: "cat_gpu", detection: "leptonai", desc: "AI inference platform", tags: ["infra"], size: "small", url: "https://lepton.ai" },
+                { id: "t_beam", name: "Beam", type: "Tool", parent: "cat_gpu", detection: "beam-cloud", desc: "Serverless GPUs", tags: ["infra"], size: "small", url: "https://beam.cloud" },
+                { id: "t_fal", name: "Fal.ai", type: "Tool", parent: "cat_gpu", detection: "fal", desc: "Fast AI inference platform", tags: ["infra", "multimodal"], size: "medium", url: "https://fal.ai" },
+                { id: "t_salad", name: "Salad", type: "Tool", parent: "cat_gpu", detection: "salad", desc: "Distributed GPU cloud", tags: ["infra"], size: "small", url: "https://salad.com" },
+                { id: "t_brev", name: "Brev.dev", type: "Tool", parent: "cat_gpu", detection: "brev", desc: "Dev environments with GPUs", tags: ["infra"], size: "tiny", url: "https://brev.dev" },
+
+                // AI Interfaces
+                { id: "t_gradio", name: "Gradio", type: "Tool", parent: "cat_ui", detection: "gradio", desc: "ML demo interfaces", tags: ["infra"], size: "large", url: "https://gradio.app" },
+                { id: "t_streamlit", name: "Streamlit", type: "Tool", parent: "cat_ui", detection: "streamlit", desc: "Data app framework", tags: ["infra"], size: "large", url: "https://streamlit.io" },
+                { id: "t_chainlit", name: "Chainlit", type: "Tool", parent: "cat_ui", detection: "chainlit", desc: "Chat UI framework", tags: ["llm", "infra"], size: "small", url: "https://chainlit.io" },
+                { id: "t_panel", name: "Panel", type: "Tool", parent: "cat_ui", detection: "panel", desc: "Data app framework", tags: ["infra"], size: "medium", url: "https://panel.holoviz.org" },
+                { id: "t_nicegui", name: "NiceGUI", type: "Tool", parent: "cat_ui", detection: "nicegui", desc: "Python web UI", tags: ["infra"], size: "small", url: "https://nicegui.io" },
+                { id: "t_mesop", name: "Mesop", type: "Tool", parent: "cat_ui", detection: "mesop", desc: "Google's UI framework", tags: ["infra"], size: "small", url: "https://google.github.io/mesop" },
+                { id: "t_openwebui", name: "Open WebUI", type: "Tool", parent: "cat_ui", detection: "open-webui", desc: "Self-hosted ChatGPT UI", tags: ["llm", "infra"], size: "small", url: "https://openwebui.com" },
+                { id: "t_librechat", name: "LibreChat", type: "Tool", parent: "cat_ui", detection: "librechat", desc: "Multi-provider chat UI", tags: ["llm", "infra"], size: "small", url: "https://librechat.ai" },
+
+                // Evaluation
+                { id: "t_ragas", name: "RAGAS", type: "Tool", parent: "cat_eval", detection: "ragas", desc: "RAG evaluation", tags: ["observability", "llm"], size: "small", url: "https://ragas.io" },
+                { id: "t_deepeval", name: "DeepEval", type: "Tool", parent: "cat_eval", detection: "deepeval", desc: "LLM unit testing", tags: ["observability"], size: "small", url: "https://deepeval.com" },
+                { id: "t_trulens", name: "TruLens", type: "Tool", parent: "cat_eval", detection: "trulens", desc: "LLM evaluation", tags: ["observability"], size: "small", url: "https://trulens.org" },
+                { id: "t_giskard", name: "Giskard", type: "Tool", parent: "cat_eval", detection: "giskard", desc: "ML testing", tags: ["observability"], size: "small", url: "https://giskard.ai" },
+                { id: "t_uptrain", name: "UpTrain", type: "Tool", parent: "cat_eval", detection: "uptrain", desc: "LLM evaluation", tags: ["observability"], size: "tiny", url: "https://uptrain.ai" },
+                { id: "t_inspect", name: "Inspect AI", type: "Tool", parent: "cat_eval", detection: "inspect-ai", desc: "UK AISI eval framework", tags: ["observability"], size: "small", url: "https://inspect.ai-safety-institute.org.uk" },
+                { id: "t_lmeval", name: "lm-eval-harness", type: "Tool", parent: "cat_eval", detection: "lm-eval", desc: "EleutherAI benchmarks", tags: ["observability"], size: "medium", url: "https://github.com/EleutherAI/lm-evaluation-harness" },
+
+                // Guardrails
+                { id: "t_nemo", name: "NeMo Guardrails", type: "Tool", parent: "cat_safety", detection: "nemoguardrails", desc: "NVIDIA guardrails toolkit", tags: ["llm", "observability"], size: "large", url: "https://github.com/NVIDIA/NeMo-Guardrails" },
+                { id: "t_guardrails", name: "Guardrails AI", type: "Tool", parent: "cat_safety", detection: "guardrails-ai", desc: "Output validation", tags: ["llm"], size: "small", url: "https://guardrailsai.com" },
+                { id: "t_lakera", name: "Lakera Guard", type: "Tool", parent: "cat_safety", detection: "lakera", desc: "Real-time LLM security", tags: ["llm", "observability"], size: "small", url: "https://lakera.ai" },
+                { id: "t_rebuff", name: "Rebuff", type: "Tool", parent: "cat_safety", detection: "rebuff", desc: "Prompt injection detection", tags: ["llm"], size: "tiny", url: "https://rebuff.ai" },
+                { id: "t_llmguard", name: "LLM Guard", type: "Tool", parent: "cat_safety", detection: "llm-guard", desc: "Security scanner", tags: ["llm"], size: "tiny", url: "https://llm-guard.com" },
+
+                // Document Processing
+                { id: "t_unstructured", name: "Unstructured", type: "Tool", parent: "cat_docs", detection: "unstructured", desc: "Document parsing", tags: ["data"], size: "medium", url: "https://unstructured.io" },
+                { id: "t_llamaparse", name: "LlamaParse", type: "Tool", parent: "cat_docs", detection: "llama-parse", desc: "LlamaIndex parser", tags: ["data", "llm"], size: "small", url: "https://llamaindex.ai/llamaparse" },
+                { id: "t_pymupdf", name: "PyMuPDF", type: "Tool", parent: "cat_docs", detection: "pymupdf", desc: "PDF processing", tags: ["data"], size: "medium", url: "https://pymupdf.io" },
+                { id: "t_pdfplumber", name: "PDFPlumber", type: "Tool", parent: "cat_docs", detection: "pdfplumber", desc: "PDF extraction", tags: ["data"], size: "small", url: "https://github.com/jsvine/pdfplumber" },
+                { id: "t_docling", name: "Docling", type: "Tool", parent: "cat_docs", detection: "docling", desc: "IBM document understanding", tags: ["data"], size: "medium", url: "https://ds4sd.github.io/docling" },
+                { id: "t_marker", name: "Marker", type: "Tool", parent: "cat_docs", detection: "marker", desc: "PDF to markdown", tags: ["data"], size: "small", url: "https://github.com/VikParuchuri/marker" },
+                { id: "t_tesseract", name: "Tesseract", type: "Tool", parent: "cat_docs", detection: "pytesseract", desc: "OCR", tags: ["data", "multimodal"], size: "large", url: "https://tesseract-ocr.github.io" },
+                { id: "t_paddleocr", name: "PaddleOCR", type: "Tool", parent: "cat_docs", detection: "paddleocr", desc: "Baidu OCR", tags: ["data", "multimodal"], size: "large", url: "https://paddlepaddle.github.io/PaddleOCR" },
+                { id: "t_easyocr", name: "EasyOCR", type: "Tool", parent: "cat_docs", detection: "easyocr", desc: "Simple OCR", tags: ["data", "multimodal"], size: "medium", url: "https://github.com/JaidedAI/EasyOCR" },
+                { id: "t_surya", name: "Surya", type: "Tool", parent: "cat_docs", detection: "surya", desc: "Document OCR", tags: ["data", "multimodal"], size: "small", url: "https://github.com/VikParuchuri/surya" },
+
+                // MCP SDKs
+                { id: "t_mcp_python", name: "MCP Python SDK", type: "Tool", parent: "sub_mcp_sdk", detection: "mcp", desc: "Official Python SDK", tags: ["mcp", "llm"], size: "medium", url: "https://modelcontextprotocol.io" },
+                { id: "t_mcp_ts", name: "MCP TypeScript SDK", type: "Tool", parent: "sub_mcp_sdk", detection: "@modelcontextprotocol/sdk", desc: "Official TS SDK", tags: ["mcp", "llm"], size: "medium", url: "https://modelcontextprotocol.io" },
+                { id: "t_fastmcp", name: "FastMCP", type: "Tool", parent: "sub_mcp_sdk", detection: "fastmcp", desc: "Simplified MCP development", tags: ["mcp", "llm"], size: "small", url: "https://github.com/jlowin/fastmcp" },
+
+                // MCP Servers
+                { id: "t_mcp_github", name: "GitHub MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-github", desc: "Repository management", tags: ["mcp"], size: "large", url: "https://github.com/modelcontextprotocol/servers" },
+                { id: "t_mcp_gitlab", name: "GitLab MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-gitlab", desc: "GitLab CI/CD", tags: ["mcp"], size: "large", url: "https://github.com/modelcontextprotocol/servers" },
+                { id: "t_mcp_filesystem", name: "Filesystem MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-filesystem", desc: "Secure file operations", tags: ["mcp"], size: "medium", url: "https://github.com/modelcontextprotocol/servers" },
+                { id: "t_mcp_memory", name: "Memory MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-memory", desc: "Knowledge graph", tags: ["mcp", "data"], size: "small", url: "https://github.com/modelcontextprotocol/servers" },
+                { id: "t_mcp_postgres", name: "Postgres MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-postgres", desc: "Database operations", tags: ["mcp", "data"], size: "medium", url: "https://github.com/modelcontextprotocol/servers" },
+                { id: "t_mcp_puppeteer", name: "Puppeteer MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-puppeteer", desc: "Browser automation", tags: ["mcp"], size: "medium", url: "https://github.com/modelcontextprotocol/servers" },
+                { id: "t_mcp_slack", name: "Slack MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-slack", desc: "Slack integration", tags: ["mcp"], size: "large", url: "https://github.com/modelcontextprotocol/servers" },
+                { id: "t_mcp_gdrive", name: "Google Drive MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-gdrive", desc: "Document access", tags: ["mcp", "data"], size: "large", url: "https://github.com/modelcontextprotocol/servers" },
+                { id: "t_mcp_notion", name: "Notion MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-notion", desc: "Notion workspace", tags: ["mcp"], size: "large", url: "https://github.com/modelcontextprotocol/servers" },
+                { id: "t_mcp_aws", name: "AWS Bedrock AgentCore", type: "Tool", parent: "sub_mcp_servers", detection: "bedrock-agentcore", desc: "Enterprise MCP", tags: ["mcp", "infra"], size: "large", url: "https://aws.amazon.com/bedrock" },
+                { id: "t_mcp_azure", name: "Azure MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-azure", desc: "40+ Azure services", tags: ["mcp", "infra"], size: "large", url: "https://azure.microsoft.com" },
+                { id: "t_mcp_cloudflare", name: "Cloudflare MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-cloudflare", desc: "Workers, KV, R2, D1", tags: ["mcp", "infra"], size: "large", url: "https://cloudflare.com" },
+                { id: "t_mcp_docker", name: "Docker MCP", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-docker", desc: "Container management", tags: ["mcp", "infra"], size: "large", url: "https://docker.com" },
+                { id: "t_mcp_sequential", name: "Sequential Thinking", type: "Tool", parent: "sub_mcp_servers", detection: "mcp-sequential-thinking", desc: "Problem-solving chains", tags: ["mcp", "llm"], size: "small", url: "https://github.com/modelcontextprotocol/servers" },
+                { id: "t_mcp_context7", name: "Context7", type: "Tool", parent: "sub_mcp_servers", detection: "context7", desc: "Version-specific docs", tags: ["mcp"], size: "small", url: "https://context7.com" },
+
+                // Vision Models
+                { id: "t_clip", name: "CLIP", type: "Tool", parent: "sub_vision", detection: "clip", desc: "Image-text understanding", tags: ["multimodal"], size: "large", url: "https://openai.com/research/clip" },
+                { id: "t_blip", name: "BLIP/BLIP-2", type: "Tool", parent: "sub_vision", detection: "blip", desc: "Image captioning, VQA", tags: ["multimodal"], size: "medium", url: "https://github.com/salesforce/BLIP" },
+                { id: "t_sam", name: "SAM", type: "Tool", parent: "sub_vision", detection: "segment-anything", desc: "Segment Anything Model", tags: ["multimodal"], size: "large", url: "https://segment-anything.com" },
+                { id: "t_sam2", name: "SAM 2", type: "Tool", parent: "sub_vision", detection: "sam2", desc: "Video segmentation", tags: ["multimodal"], size: "large", url: "https://ai.meta.com/sam2" },
+                { id: "t_florence", name: "Florence-2", type: "Tool", parent: "sub_vision", detection: "florence", desc: "Microsoft vision model", tags: ["multimodal"], size: "large", url: "https://huggingface.co/microsoft/Florence-2-large" },
+                { id: "t_llava", name: "LLaVA", type: "Tool", parent: "sub_vision", detection: "llava", desc: "Language-Vision Assistant", tags: ["multimodal", "llm"], size: "medium", url: "https://llava-vl.github.io" },
+                { id: "t_cogvlm", name: "CogVLM", type: "Tool", parent: "sub_vision", detection: "cogvlm", desc: "Visual language model", tags: ["multimodal", "llm"], size: "medium", url: "https://github.com/THUDM/CogVLM" },
+                { id: "t_qwenvl", name: "Qwen-VL", type: "Tool", parent: "sub_vision", detection: "qwen-vl", desc: "Alibaba vision-language", tags: ["multimodal", "llm"], size: "large", url: "https://github.com/QwenLM/Qwen-VL" },
+
+                // Audio Models
+                { id: "t_whisper", name: "Whisper", type: "Tool", parent: "sub_audio", detection: "whisper", desc: "Speech-to-text", tags: ["multimodal"], size: "large", url: "https://openai.com/research/whisper" },
+                { id: "t_faster_whisper", name: "Faster Whisper", type: "Tool", parent: "sub_audio", detection: "faster-whisper", desc: "Optimized Whisper", tags: ["multimodal"], size: "medium", url: "https://github.com/SYSTRAN/faster-whisper" },
+                { id: "t_bark", name: "Bark", type: "Tool", parent: "sub_audio", detection: "bark", desc: "Text-to-speech", tags: ["multimodal"], size: "medium", url: "https://github.com/suno-ai/bark" },
+                { id: "t_tortoise", name: "TortoiseTTS", type: "Tool", parent: "sub_audio", detection: "tortoise-tts", desc: "High-quality TTS", tags: ["multimodal"], size: "small", url: "https://github.com/neonbjb/tortoise-tts" },
+                { id: "t_coqui", name: "Coqui TTS", type: "Tool", parent: "sub_audio", detection: "TTS", desc: "Open-source TTS", tags: ["multimodal"], size: "medium", url: "https://coqui.ai" },
+                { id: "t_whisperx", name: "WhisperX", type: "Tool", parent: "sub_audio", detection: "whisperx", desc: "Whisper with alignment", tags: ["multimodal"], size: "small", url: "https://github.com/m-bain/whisperX" },
+                { id: "t_audiocraft", name: "AudioCraft", type: "Tool", parent: "sub_audio", detection: "audiocraft", desc: "Meta audio generation", tags: ["multimodal"], size: "large", url: "https://audiocraft.metademolab.com" },
+                { id: "t_elevenlabs", name: "ElevenLabs", type: "Tool", parent: "sub_audio", detection: "elevenlabs", desc: "AI voice synthesis & cloning", tags: ["multimodal"], size: "large", url: "https://elevenlabs.io" },
+                { id: "t_assemblyai", name: "AssemblyAI", type: "Tool", parent: "sub_audio", detection: "assemblyai", desc: "Speech-to-text API", tags: ["multimodal"], size: "medium", url: "https://assemblyai.com" },
+                { id: "t_deepgram", name: "Deepgram", type: "Tool", parent: "sub_audio", detection: "deepgram", desc: "Speech recognition API", tags: ["multimodal"], size: "medium", url: "https://deepgram.com" },
+                { id: "t_playht", name: "PlayHT", type: "Tool", parent: "sub_audio", detection: "pyht", desc: "AI voice generation", tags: ["multimodal"], size: "small", url: "https://play.ht" },
+                { id: "t_resemble", name: "Resemble AI", type: "Tool", parent: "sub_audio", detection: "resemble", desc: "Voice cloning platform", tags: ["multimodal"], size: "small", url: "https://resemble.ai" },
+
+                // Image Generation
+                { id: "t_sd", name: "Stable Diffusion", type: "Tool", parent: "sub_imagegen", detection: "diffusers", desc: "Open image generation", tags: ["multimodal"], size: "large", url: "https://stability.ai" },
+                { id: "t_sdxl", name: "SDXL", type: "Tool", parent: "sub_imagegen", detection: "diffusers", desc: "SD XL models", tags: ["multimodal"], size: "large", url: "https://stability.ai/stable-image" },
+                { id: "t_flux", name: "Flux", type: "Tool", parent: "sub_imagegen", detection: "flux", desc: "Black Forest Labs", tags: ["multimodal"], size: "medium", url: "https://blackforestlabs.ai" },
+                { id: "t_dalle", name: "DALL-E", type: "Tool", parent: "sub_imagegen", detection: "openai", desc: "OpenAI image generation", tags: ["multimodal"], size: "large", url: "https://openai.com/dall-e-3" },
+                { id: "t_controlnet", name: "ControlNet", type: "Tool", parent: "sub_imagegen", detection: "controlnet", desc: "Conditional generation", tags: ["multimodal"], size: "medium", url: "https://github.com/lllyasviel/ControlNet" },
+                { id: "t_midjourney", name: "Midjourney", type: "Tool", parent: "sub_imagegen", detection: "midjourney", desc: "AI art generation", tags: ["multimodal"], size: "large", url: "https://midjourney.com" },
+                { id: "t_ideogram", name: "Ideogram", type: "Tool", parent: "sub_imagegen", detection: "ideogram", desc: "Text-in-image generation", tags: ["multimodal"], size: "medium", url: "https://ideogram.ai" },
+
+                // Data Labeling
+                { id: "t_labelstudio", name: "Label Studio", type: "Tool", parent: "cat_labeling", detection: "label-studio", desc: "Open-source labeling", tags: ["data"], size: "medium", url: "https://labelstud.io" },
+                { id: "t_labelbox", name: "Labelbox", type: "Tool", parent: "cat_labeling", detection: "labelbox", desc: "Enterprise labeling", tags: ["data"], size: "large", url: "https://labelbox.com" },
+                { id: "t_snorkel", name: "Snorkel AI", type: "Tool", parent: "cat_labeling", detection: "snorkel", desc: "Programmatic labeling", tags: ["data"], size: "medium", url: "https://snorkel.ai" },
+                { id: "t_argilla", name: "Argilla", type: "Tool", parent: "cat_labeling", detection: "argilla", desc: "Data curation for LLMs", tags: ["data", "llm"], size: "small", url: "https://argilla.io" },
+                { id: "t_prodigy", name: "Prodigy", type: "Tool", parent: "cat_labeling", detection: "prodigy", desc: "spaCy annotation tool", tags: ["data"], size: "small", url: "https://prodi.gy" },
+                { id: "t_cvat", name: "CVAT", type: "Tool", parent: "cat_labeling", detection: "cvat", desc: "Computer vision annotation", tags: ["data", "multimodal"], size: "medium", url: "https://cvat.ai" },
+                { id: "t_roboflow", name: "Roboflow", type: "Tool", parent: "cat_labeling", detection: "roboflow", desc: "Vision data management", tags: ["data", "multimodal"], size: "medium", url: "https://roboflow.com" },
+                { id: "t_scaleai", name: "Scale AI", type: "Tool", parent: "cat_labeling", detection: "scaleai", desc: "Enterprise data labeling", tags: ["data"], size: "large", url: "https://scale.com" },
+
+                // Code Assistants
+                { id: "t_copilot", name: "GitHub Copilot", type: "Tool", parent: "cat_code", detection: "copilot", desc: "Microsoft code AI", tags: ["llm"], size: "large", url: "https://github.com/features/copilot" },
+                { id: "t_cursor", name: "Cursor", type: "Tool", parent: "cat_code", detection: "cursor", desc: "AI-first code editor", tags: ["llm"], size: "medium", url: "https://cursor.com" },
+                { id: "t_windsurf", name: "Windsurf", type: "Tool", parent: "cat_code", detection: "windsurf", desc: "Codeium coding IDE", tags: ["llm"], size: "medium", url: "https://codeium.com/windsurf" },
+                { id: "t_codeium", name: "Codeium", type: "Tool", parent: "cat_code", detection: "codeium", desc: "Free AI code completion", tags: ["llm"], size: "medium", url: "https://codeium.com" },
+                { id: "t_tabnine", name: "Tabnine", type: "Tool", parent: "cat_code", detection: "tabnine", desc: "Privacy-focused code AI", tags: ["llm"], size: "medium", url: "https://tabnine.com" },
+                { id: "t_amazonq", name: "Amazon Q", type: "Tool", parent: "cat_code", detection: "amazon-q", desc: "AWS coding assistant", tags: ["llm"], size: "large", url: "https://aws.amazon.com/q" },
+                { id: "t_aider", name: "Aider", type: "Tool", parent: "cat_code", detection: "aider", desc: "AI pair programming CLI", tags: ["llm"], size: "small", url: "https://aider.chat" },
+                { id: "t_continue", name: "Continue", type: "Tool", parent: "cat_code", detection: "continue", desc: "Open-source code assistant", tags: ["llm"], size: "small", url: "https://continue.dev" },
+                { id: "t_cody", name: "Sourcegraph Cody", type: "Tool", parent: "cat_code", detection: "cody", desc: "Code AI with context", tags: ["llm"], size: "medium", url: "https://sourcegraph.com/cody" },
+
+                // Research Tools
+                { id: "t_notebooklm", name: "NotebookLM", type: "Tool", parent: "cat_research", detection: "notebooklm", desc: "Google AI research assistant", tags: ["llm"], size: "large", url: "https://notebooklm.google" },
+                { id: "t_perplexity_search", name: "Perplexity Search", type: "Tool", parent: "cat_research", detection: "perplexity", desc: "AI search engine", tags: ["llm"], size: "large", url: "https://perplexity.ai" },
+                { id: "t_consensus", name: "Consensus", type: "Tool", parent: "cat_research", detection: "consensus", desc: "Academic paper AI", tags: ["llm"], size: "small", url: "https://consensus.app" },
+                { id: "t_elicit", name: "Elicit", type: "Tool", parent: "cat_research", detection: "elicit", desc: "Research workflow AI", tags: ["llm"], size: "small", url: "https://elicit.com" },
+
+                // Cloud Platforms
+                { id: "t_sagemaker", name: "AWS SageMaker", type: "Tool", parent: "cat_cloud", detection: "sagemaker", desc: "End-to-end ML platform", tags: ["infra"], size: "large", url: "https://aws.amazon.com/sagemaker" },
+                { id: "t_vertex", name: "Google Vertex AI", type: "Tool", parent: "cat_cloud", detection: "google-cloud-aiplatform", desc: "GCP ML platform", tags: ["infra"], size: "large", url: "https://cloud.google.com/vertex-ai" },
+                { id: "t_azureml", name: "Azure ML", type: "Tool", parent: "cat_cloud", detection: "azureml", desc: "Microsoft ML platform", tags: ["infra"], size: "large", url: "https://azure.microsoft.com/en-us/products/machine-learning" },
+                { id: "t_databricks", name: "Databricks", type: "Tool", parent: "cat_cloud", detection: "databricks", desc: "Unified analytics", tags: ["infra", "data"], size: "large", url: "https://databricks.com" },
+                { id: "t_snowflake", name: "Snowflake Cortex", type: "Tool", parent: "cat_cloud", detection: "snowflake", desc: "Data cloud AI", tags: ["infra", "data"], size: "large", url: "https://snowflake.com/cortex" },
+                { id: "t_h2o", name: "H2O.ai", type: "Tool", parent: "cat_cloud", detection: "h2o", desc: "AutoML platform", tags: ["infra", "training"], size: "medium", url: "https://h2o.ai" },
+                { id: "t_datarobot", name: "DataRobot", type: "Tool", parent: "cat_cloud", detection: "datarobot", desc: "Enterprise AutoML", tags: ["infra", "training"], size: "large", url: "https://datarobot.com" },
+
+                // AI Communication
+                { id: "t_twilio", name: "Twilio", type: "Tool", parent: "cat_comm", detection: "twilio", desc: "Voice, SMS, video APIs", tags: ["infra"], size: "large", url: "https://twilio.com" },
+                { id: "t_vonage", name: "Vonage", type: "Tool", parent: "cat_comm", detection: "vonage", desc: "Communication APIs", tags: ["infra"], size: "large", url: "https://vonage.com" },
+                { id: "t_livekit", name: "LiveKit", type: "Tool", parent: "cat_comm", detection: "livekit", desc: "Real-time audio/video", tags: ["infra", "multimodal"], size: "medium", url: "https://livekit.io" },
+                { id: "t_daily", name: "Daily.co", type: "Tool", parent: "cat_comm", detection: "daily", desc: "Video call API", tags: ["infra", "multimodal"], size: "medium", url: "https://daily.co" },
+                { id: "t_agora", name: "Agora", type: "Tool", parent: "cat_comm", detection: "agora", desc: "Real-time engagement", tags: ["infra", "multimodal"], size: "large", url: "https://agora.io" },
+                { id: "t_vapi", name: "Vapi", type: "Tool", parent: "cat_comm", detection: "vapi", desc: "Voice AI agents", tags: ["llm", "multimodal"], size: "small", url: "https://vapi.ai" },
+                { id: "t_bland", name: "Bland AI", type: "Tool", parent: "cat_comm", detection: "bland", desc: "AI phone calls", tags: ["llm", "multimodal"], size: "small", url: "https://bland.ai" },
+                { id: "t_retell", name: "Retell AI", type: "Tool", parent: "cat_comm", detection: "retell", desc: "Voice AI platform", tags: ["llm", "multimodal"], size: "small", url: "https://retellai.com" },
+
+                // Video AI
+                { id: "t_runway", name: "Runway", type: "Tool", parent: "cat_video", detection: "runwayml", desc: "AI video generation", tags: ["multimodal"], size: "large", url: "https://runwayml.com" },
+                { id: "t_pika", name: "Pika", type: "Tool", parent: "cat_video", detection: "pika", desc: "AI video creation", tags: ["multimodal"], size: "medium", url: "https://pika.art" },
+                { id: "t_heygen", name: "HeyGen", type: "Tool", parent: "cat_video", detection: "heygen", desc: "AI avatar videos", tags: ["multimodal"], size: "medium", url: "https://heygen.com" },
+                { id: "t_synthesia", name: "Synthesia", type: "Tool", parent: "cat_video", detection: "synthesia", desc: "AI video avatars", tags: ["multimodal"], size: "large", url: "https://synthesia.io" },
+                { id: "t_descript", name: "Descript", type: "Tool", parent: "cat_video", detection: "descript", desc: "AI video editing", tags: ["multimodal"], size: "medium", url: "https://descript.com" },
+                { id: "t_luma", name: "Luma AI", type: "Tool", parent: "cat_video", detection: "lumaai", desc: "Dream Machine video gen", tags: ["multimodal"], size: "medium", url: "https://lumalabs.ai" },
+                { id: "t_kling", name: "Kling", type: "Tool", parent: "cat_video", detection: "kling", desc: "Kuaishou video AI", tags: ["multimodal"], size: "large", url: "https://klingai.com" },
+                { id: "t_sora", name: "Sora", type: "Tool", parent: "cat_video", detection: "sora", desc: "OpenAI video generation", tags: ["multimodal"], size: "large", url: "https://openai.com/sora" },
+                { id: "t_twelve_labs", name: "Twelve Labs", type: "Tool", parent: "cat_video", detection: "twelvelabs", desc: "Video understanding API", tags: ["multimodal", "data"], size: "medium", url: "https://twelvelabs.io" },
+
+                // ========== ADDITIONAL STARTUPS ==========
+
+                // LLM Orchestration Startups
+                { id: "t_parea", name: "Parea", type: "Tool", parent: "cat_llm", detection: "parea", desc: "LLM development platform", tags: ["llm", "observability"], size: "tiny", url: "https://parea.ai" },
+                { id: "t_lamini", name: "Lamini", type: "Tool", parent: "cat_llm", detection: "lamini", desc: "Enterprise LLM platform", tags: ["llm", "training"], size: "tiny", url: "https://lamini.ai" },
+                { id: "t_vellum", name: "Vellum", type: "Tool", parent: "cat_llm", detection: "vellum", desc: "LLM product development", tags: ["llm"], size: "tiny", url: "https://vellum.ai" },
+                { id: "t_keywords", name: "Keywords AI", type: "Tool", parent: "cat_llm", detection: "keywordsai", desc: "LLM monitoring platform", tags: ["llm", "observability"], size: "tiny", url: "https://keywordsai.co" },
+
+                // Agent Startups
+                { id: "t_e2b", name: "E2B", type: "Tool", parent: "cat_agents", detection: "e2b", desc: "Code interpreter sandbox", tags: ["llm", "infra"], size: "tiny", url: "https://e2b.dev" },
+                { id: "t_composio", name: "Composio", type: "Tool", parent: "cat_agents", detection: "composio", desc: "Agent tool integrations", tags: ["llm"], size: "tiny", url: "https://composio.dev" },
+                { id: "t_browseruse", name: "Browser Use", type: "Tool", parent: "cat_agents", detection: "browser-use", desc: "Browser automation agents", tags: ["llm"], size: "tiny", url: "https://browser-use.com" },
+                { id: "t_agentql", name: "AgentQL", type: "Tool", parent: "cat_agents", detection: "agentql", desc: "Web scraping for agents", tags: ["llm", "data"], size: "tiny", url: "https://agentql.com" },
+                { id: "t_multion", name: "MultiOn", type: "Tool", parent: "cat_agents", detection: "multion", desc: "AI web agent", tags: ["llm"], size: "tiny", url: "https://multion.ai" },
+                { id: "t_fixie", name: "Fixie", type: "Tool", parent: "cat_agents", detection: "fixie", desc: "Agent building platform", tags: ["llm"], size: "tiny", url: "https://fixie.ai" },
+
+                // Fine-tuning Startups
+                { id: "t_predibase", name: "Predibase", type: "Tool", parent: "cat_finetune", detection: "predibase", desc: "Fine-tuning platform", tags: ["training"], size: "tiny", url: "https://predibase.com" },
+                { id: "t_openpipe", name: "OpenPipe", type: "Tool", parent: "cat_finetune", detection: "openpipe", desc: "LLM fine-tuning from logs", tags: ["training", "llm"], size: "tiny", url: "https://openpipe.ai" },
+                { id: "t_anyscale_ft", name: "Anyscale Endpoints", type: "Tool", parent: "cat_finetune", detection: "anyscale", desc: "Serverless fine-tuning", tags: ["training", "infra"], size: "tiny", url: "https://anyscale.com/endpoints" },
+
+                // Observability Startups
+                { id: "t_opik", name: "Opik", type: "Tool", parent: "cat_observability", detection: "opik", desc: "LLM debugging platform", tags: ["observability"], size: "tiny", url: "https://comet.com/opik" },
+                { id: "t_lunary", name: "Lunary", type: "Tool", parent: "cat_observability", detection: "lunary", desc: "Open-source LLM monitoring", tags: ["observability"], size: "tiny", url: "https://lunary.ai" },
+                { id: "t_pydantic_logfire", name: "Pydantic Logfire", type: "Tool", parent: "cat_observability", detection: "logfire", desc: "Python observability", tags: ["observability"], size: "tiny", url: "https://pydantic.dev/logfire" },
+                { id: "t_langtrace", name: "Langtrace", type: "Tool", parent: "cat_observability", detection: "langtrace", desc: "Open-source LLM tracing", tags: ["observability"], size: "tiny", url: "https://langtrace.ai" },
+                { id: "t_athina", name: "Athina", type: "Tool", parent: "cat_observability", detection: "athina", desc: "LLM monitoring & eval", tags: ["observability"], size: "tiny", url: "https://athina.ai" },
+
+                // Vector DB Startups
+                { id: "t_turbopuffer", name: "Turbopuffer", type: "Tool", parent: "cat_vectordb", detection: "turbopuffer", desc: "Serverless vector DB", tags: ["data"], size: "tiny", url: "https://turbopuffer.com" },
+                { id: "t_marqo", name: "Marqo", type: "Tool", parent: "cat_vectordb", detection: "marqo", desc: "Tensor search engine", tags: ["data"], size: "tiny", url: "https://marqo.ai" },
+                { id: "t_vespa", name: "Vespa", type: "Tool", parent: "cat_vectordb", detection: "pyvespa", desc: "Vector + search engine", tags: ["data"], size: "tiny", url: "https://vespa.ai" },
+
+                // Memory Startups
+                { id: "t_cognee", name: "Cognee", type: "Tool", parent: "cat_memory", detection: "cognee", desc: "AI memory management", tags: ["llm", "data"], size: "tiny", url: "https://cognee.ai" },
+                { id: "t_graphiti", name: "Graphiti", type: "Tool", parent: "cat_memory", detection: "graphiti", desc: "Temporal knowledge graphs", tags: ["llm", "data"], size: "tiny", url: "https://github.com/getzep/graphiti" },
+
+                // Guardrails Startups
+                { id: "t_promptarmor", name: "Prompt Armor", type: "Tool", parent: "cat_safety", detection: "promptarmor", desc: "Prompt injection defense", tags: ["llm"], size: "tiny", url: "https://promptarmor.com" },
+                { id: "t_vigil", name: "Vigil", type: "Tool", parent: "cat_safety", detection: "vigil-llm", desc: "LLM security scanner", tags: ["llm"], size: "tiny", url: "https://github.com/deadbits/vigil-llm" },
+                { id: "t_whylabs", name: "WhyLabs", type: "Tool", parent: "cat_safety", detection: "whylogs", desc: "AI observability & safety", tags: ["llm", "observability"], size: "tiny", url: "https://whylabs.ai" },
+
+                // Code Assistant Startups
+                { id: "t_sweep", name: "Sweep", type: "Tool", parent: "cat_code", detection: "sweep", desc: "AI junior developer", tags: ["llm"], size: "tiny", url: "https://sweep.dev" },
+                { id: "t_mentat", name: "Mentat", type: "Tool", parent: "cat_code", detection: "mentat", desc: "AI coding assistant CLI", tags: ["llm"], size: "tiny", url: "https://mentat.ai" },
+                { id: "t_codegen", name: "Codegen", type: "Tool", parent: "cat_code", detection: "codegen", desc: "Code generation platform", tags: ["llm"], size: "tiny", url: "https://codegen.com" },
+                { id: "t_supermaven", name: "Supermaven", type: "Tool", parent: "cat_code", detection: "supermaven", desc: "Fast code completion", tags: ["llm"], size: "tiny", url: "https://supermaven.com" },
+                { id: "t_coderabbit", name: "CodeRabbit", type: "Tool", parent: "cat_code", detection: "coderabbit", desc: "AI code review", tags: ["llm"], size: "tiny", url: "https://coderabbit.ai" },
+
+                // GPU Cloud Startups
+                { id: "t_shadeform", name: "Shadeform", type: "Tool", parent: "cat_gpu", detection: "shadeform", desc: "GPU aggregator", tags: ["infra"], size: "tiny", url: "https://shadeform.ai" },
+                { id: "t_fluidstack", name: "FluidStack", type: "Tool", parent: "cat_gpu", detection: "fluidstack", desc: "Distributed GPU cloud", tags: ["infra"], size: "tiny", url: "https://fluidstack.io" },
+                { id: "t_tensordock", name: "TensorDock", type: "Tool", parent: "cat_gpu", detection: "tensordock", desc: "Affordable GPU cloud", tags: ["infra"], size: "tiny", url: "https://tensordock.com" },
+                { id: "t_hyperstack", name: "Hyperstack", type: "Tool", parent: "cat_gpu", detection: "hyperstack", desc: "Enterprise GPU cloud", tags: ["infra"], size: "tiny", url: "https://hyperstack.cloud" },
+
+                // Communication Startups
+                { id: "t_hume", name: "Hume AI", type: "Tool", parent: "cat_comm", detection: "hume", desc: "Empathic voice AI", tags: ["llm", "multimodal"], size: "tiny", url: "https://hume.ai" },
+                { id: "t_cartesia", name: "Cartesia", type: "Tool", parent: "cat_comm", detection: "cartesia", desc: "Real-time voice AI", tags: ["multimodal"], size: "tiny", url: "https://cartesia.ai" },
+                { id: "t_speechmatics", name: "Speechmatics", type: "Tool", parent: "cat_comm", detection: "speechmatics", desc: "Speech recognition API", tags: ["multimodal"], size: "tiny", url: "https://speechmatics.com" },
+
+                // Document Processing Startups
+                { id: "t_zerox", name: "Zerox", type: "Tool", parent: "cat_docs", detection: "zerox", desc: "Vision-based OCR", tags: ["data", "multimodal"], size: "tiny", url: "https://github.com/getomni-ai/zerox" },
+                { id: "t_reducto", name: "Reducto", type: "Tool", parent: "cat_docs", detection: "reducto", desc: "Document parsing API", tags: ["data"], size: "tiny", url: "https://reducto.ai" },
+                { id: "t_docsumo", name: "Docsumo", type: "Tool", parent: "cat_docs", detection: "docsumo", desc: "Intelligent doc capture", tags: ["data"], size: "tiny", url: "https://docsumo.com" },
+
+                // Evaluation Startups
+                { id: "t_baserun", name: "Baserun", type: "Tool", parent: "cat_eval", detection: "baserun", desc: "LLM testing platform", tags: ["observability"], size: "tiny", url: "https://baserun.ai" },
+                { id: "t_freeplay", name: "Freeplay", type: "Tool", parent: "cat_eval", detection: "freeplay", desc: "LLM product testing", tags: ["observability", "llm"], size: "tiny", url: "https://freeplay.ai" },
+                { id: "t_autoblocks", name: "Autoblocks", type: "Tool", parent: "cat_eval", detection: "autoblocks", desc: "LLM testing & monitoring", tags: ["observability"], size: "tiny", url: "https://autoblocks.ai" },
+
+                // Visual Builders Startups
+                { id: "t_stack", name: "Stack AI", type: "Tool", parent: "cat_visual", detection: "stack-ai", desc: "Enterprise AI workflows", tags: ["llm"], size: "tiny", url: "https://stack-ai.com" },
+                { id: "t_vectorshift", name: "VectorShift", type: "Tool", parent: "cat_visual", detection: "vectorshift", desc: "No-code AI pipelines", tags: ["llm"], size: "tiny", url: "https://vectorshift.ai" },
+                { id: "t_voiceflow", name: "Voiceflow", type: "Tool", parent: "cat_visual", detection: "voiceflow", desc: "Conversational AI builder", tags: ["llm"], size: "tiny", url: "https://voiceflow.com" },
+
+                // API Gateway Startups
+                { id: "t_unify", name: "Unify", type: "Tool", parent: "cat_gateway", detection: "unify", desc: "LLM router & optimizer", tags: ["infra", "llm"], size: "tiny", url: "https://unify.ai" },
+                { id: "t_notdiamond", name: "Not Diamond", type: "Tool", parent: "cat_gateway", detection: "notdiamond", desc: "AI model router", tags: ["infra", "llm"], size: "tiny", url: "https://notdiamond.ai" },
+
+                // Model Serving Startups
+                { id: "t_inferless", name: "Inferless", type: "Tool", parent: "cat_serving", detection: "inferless", desc: "Serverless ML inference", tags: ["infra"], size: "tiny", url: "https://inferless.com" },
+                { id: "t_cerebrium", name: "Cerebrium", type: "Tool", parent: "cat_serving", detection: "cerebrium", desc: "Serverless GPU inference", tags: ["infra"], size: "tiny", url: "https://cerebrium.ai" },
+                { id: "t_mystic", name: "Mystic", type: "Tool", parent: "cat_serving", detection: "mystic", desc: "ML model deployment", tags: ["infra"], size: "tiny", url: "https://mystic.ai" }
+            ],
+            links: []
+        };
+
+        // Build links from parent relationships
+        data.nodes.forEach(node => {
+            if (node.type === "Category") {
+                data.links.push({ source: "root", target: node.id, type: "category" });
+            } else if (node.parent) {
+                const linkType = node.type === "Subcategory" ? "subcategory" : "tool";
+                data.links.push({ source: node.parent, target: node.id, type: linkType });
+            }
+        });
+
+        const width = window.innerWidth;
+        const height = window.innerHeight - 90;
+
+        const svg = d3.select("#graph")
+            .attr("width", width)
+            .attr("height", height);
+
+        const g = svg.append("g");
+
+        // Zoom
+        svg.call(d3.zoom()
+            .scaleExtent([0.1, 4])
+            .on("zoom", (e) => g.attr("transform", e.transform)));
+
+        const simulation = d3.forceSimulation(data.nodes)
+            .force("link", d3.forceLink(data.links).id(d => d.id).distance(d => {
+                if (d.type === "category") return 120;
+                if (d.type === "subcategory") return 60;
+                return 30;
+            }))
+            .force("charge", d3.forceManyBody().strength(d => {
+                if (d.type === "Root") return -400;
+                if (d.type === "Category") return -120;
+                if (d.type === "Subcategory") return -60;
+                return -18;
+            }))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("collision", d3.forceCollide().radius(d => {
+                if (d.type === "Root") return 62;
+                if (d.type === "Category") return 47;
+                if (d.type === "Subcategory") return 34;
+                if (d.type === "Tool") return sizeMap[d.size] + 18;
+                return 24;
+            }));
+
+        const link = g.append("g")
+            .selectAll("line")
+            .data(data.links)
+            .join("line")
+            .attr("class", d => `link link-${d.type}`);
+
+        // Helper to get icon URL for a tool
+        function getIconUrl(d) {
+            if (d.type !== "Tool") return null;
+            const key = d.id.replace('t_', '');
+            return iconMap[key] || null;
+        }
+
+        // Helper to get node radius
+        function getRadius(d) {
+            if (d.type === "Root") return 30;
+            if (d.type === "Category") return 20;
+            if (d.type === "Subcategory") return 12;
+            if (d.type === "Tool") return sizeMap[d.size] || 6;
+            return 6;
+        }
+
+        // Create node groups
+        const nodeGroup = g.append("g")
+            .selectAll("g")
+            .data(data.nodes)
+            .join("g")
+            .attr("class", d => `node-group node-group-${d.type.toLowerCase()}`)
+            .style("cursor", d => d.url ? "pointer" : "default")
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+        // For tools WITH icons: add white background circle
+        nodeGroup.filter(d => getIconUrl(d) !== null)
+            .append("circle")
+            .attr("r", d => getRadius(d))
+            .attr("class", "icon-bg");
+
+        // For tools WITHOUT icons OR non-tool nodes: add colored circle
+        nodeGroup.filter(d => getIconUrl(d) === null)
+            .append("circle")
+            .attr("r", d => getRadius(d))
+            .attr("class", d => `node-${d.type.toLowerCase()}`);
+
+        // Also keep colored circles as node reference
+        const node = nodeGroup.selectAll("circle");
+
+        // Add icons as images for tools that have them
+        nodeGroup.filter(d => getIconUrl(d) !== null)
+            .append("image")
+            .attr("xlink:href", d => getIconUrl(d))
+            .attr("width", d => getRadius(d) * 1.6)
+            .attr("height", d => getRadius(d) * 1.6)
+            .attr("x", d => -getRadius(d) * 0.8)
+            .attr("y", d => -getRadius(d) * 0.8)
+            .style("pointer-events", "none")
+            .on("error", function() {
+                // On icon load failure, try Google favicon as fallback
+                const el = d3.select(this);
+                const d = el.datum();
+                const alreadyRetried = el.attr("data-retried");
+                if (!alreadyRetried && d.url) {
+                    try {
+                        const domain = new URL(d.url).hostname;
+                        el.attr("data-retried", "1")
+                          .attr("xlink:href", `https://www.google.com/s2/favicons?domain=${domain}&sz=64`);
+                    } catch(e) {
+                        const parent = d3.select(this.parentNode);
+                        el.style("display", "none");
+                        parent.select(".icon-bg").attr("class", "node-tool");
+                    }
+                } else {
+                    const parent = d3.select(this.parentNode);
+                    el.style("display", "none");
+                    parent.select(".icon-bg").attr("class", "node-tool");
+                }
+            });
+
+        const label = g.append("g")
+            .selectAll("text")
+            .data(data.nodes)
+            .join("text")
+            .attr("class", d => {
+                if (d.type === "Root") return "root-label";
+                if (d.type === "Category") return "category-label";
+                if (d.type === "Subcategory") return "subcategory-label";
+                return "node-label";
+            })
+            .attr("dx", d => {
+                if (d.type === "Root") return 35;
+                if (d.type === "Category") return 24;
+                if (d.type === "Subcategory") return 16;
+                if (d.type === "Tool") return (sizeMap[d.size] || 6) + 4;
+                return 10;
+            })
+            .attr("dy", 4)
+            .text(d => d.name);
+
+        const tooltip = d3.select("#tooltip");
+
+        // Hover tooltip
+        nodeGroup.on("mouseover", (e, d) => {
+            let content = `<div class="name">${d.name}</div>`;
+            if (d.desc) {
+                content += `<div class="desc">${d.desc}</div>`;
+            }
+            if (d.detection && d.detection !== "-") {
+                content += `<div class="detection">Detection: ${d.detection}</div>`;
+            }
+            if (d.tags && d.tags.length > 0) {
+                content += `<div class="tags">${d.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>`;
+            }
+            if (d.url) {
+                content += `<div class="url">${d.url}</div>`;
+                content += `<div class="hint">Click to open website</div>`;
+            }
+            tooltip.html(content)
+                .style("left", (e.pageX + 15) + "px")
+                .style("top", (e.pageY + 15) + "px")
+                .style("display", "block");
+        }).on("mouseout", () => tooltip.style("display", "none"))
+
+        // Click to open URL
+        .on("click", (e, d) => {
+            if (d.url) {
+                window.open(d.url, '_blank');
+            }
+        });
+
+        simulation.on("tick", () => {
+            link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+            nodeGroup.attr("transform", d => `translate(${d.x},${d.y})`);
+            label.attr("x", d => d.x).attr("y", d => d.y);
+        });
+
+        function dragstarted(e) {
+            if (!e.active) simulation.alphaTarget(0.3).restart();
+            e.subject.fx = e.subject.x;
+            e.subject.fy = e.subject.y;
+        }
+        function dragged(e) {
+            e.subject.fx = e.x;
+            e.subject.fy = e.y;
+        }
+        function dragended(e) {
+            if (!e.active) simulation.alphaTarget(0);
+            e.subject.fx = null;
+            e.subject.fy = null;
+        }
+
+        // Search with dropdown + path highlighting
+        const searchInput = document.getElementById('searchInput');
+        const dropdown = document.getElementById('search-dropdown');
+        const nodeById = {};
+        data.nodes.forEach(n => nodeById[n.id] = n);
+        let dropdownIndex = -1;
+
+        function getPathToRoot(nodeId) {
+            const path = new Set();
+            let current = nodeById[nodeId];
+            while (current) {
+                path.add(current.id);
+                current = current.parent ? nodeById[current.parent] : null;
+            }
+            path.add('root');
+            return path;
+        }
+
+        function getCategoryName(node) {
+            let current = node;
+            while (current && current.type !== 'Category') {
+                current = current.parent ? nodeById[current.parent] : null;
+            }
+            return current ? current.name : '';
+        }
+
+        function highlightPath(toolId) {
+            const pathIds = getPathToRoot(toolId);
+
+            nodeGroup.attr("opacity", d => pathIds.has(d.id) ? 1 : 0.08);
+            nodeGroup.classed("path-node-glow", d => pathIds.has(d.id));
+            label.attr("opacity", d => pathIds.has(d.id) ? 1 : 0.08);
+
+            link.attr("opacity", d => {
+                const sId = typeof d.source === 'object' ? d.source.id : d.source;
+                const tId = typeof d.target === 'object' ? d.target.id : d.target;
+                return (pathIds.has(sId) && pathIds.has(tId)) ? 1 : 0.03;
+            });
+            link.classed("path-highlight", d => {
+                const sId = typeof d.source === 'object' ? d.source.id : d.source;
+                const tId = typeof d.target === 'object' ? d.target.id : d.target;
+                return pathIds.has(sId) && pathIds.has(tId);
+            });
+        }
+
+        function clearHighlight() {
+            nodeGroup.attr("opacity", 1).classed("path-node-glow", false);
+            label.attr("opacity", 1);
+            link.attr("opacity", 1).classed("path-highlight", false);
+        }
+
+        function buildDropdown(query) {
+            if (!query) { dropdown.classList.remove('visible'); return; }
+            const q = query.toLowerCase();
+            const matches = data.nodes.filter(n => {
+                if (n.type !== 'Tool') return false;
+                return n.name.toLowerCase().includes(q) ||
+                       (n.desc && n.desc.toLowerCase().includes(q)) ||
+                       (n.detection && n.detection.toLowerCase().includes(q));
+            }).slice(0, 12);
+
+            if (matches.length === 0) { dropdown.classList.remove('visible'); clearHighlight(); return; }
+
+            dropdown.innerHTML = matches.map((m, i) => {
+                const iconUrl = getIconUrl(m);
+                const cat = getCategoryName(m);
+                const iconHtml = iconUrl ? `<img class="item-icon" src="${iconUrl}" onerror="this.style.display='none'">` : '';
+                return `<div class="search-item${i === dropdownIndex ? ' active' : ''}" data-id="${m.id}">
+                    ${iconHtml}<span class="item-name">${m.name}</span><span class="item-category">${cat}</span>
+                </div>`;
+            }).join('');
+            dropdown.classList.add('visible');
+
+            dropdown.querySelectorAll('.search-item').forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    dropdown.querySelectorAll('.search-item').forEach(el => el.classList.remove('active'));
+                    item.classList.add('active');
+                    highlightPath(item.dataset.id);
+                });
+                item.addEventListener('click', () => {
+                    searchInput.value = item.querySelector('.item-name').textContent;
+                    dropdown.classList.remove('visible');
+                    highlightPath(item.dataset.id);
+                });
+            });
+
+            // Highlight first match path by default
+            if (matches.length > 0 && dropdownIndex < 0) highlightPath(matches[0].id);
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            dropdownIndex = -1;
+            buildDropdown(e.target.value);
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            const items = dropdown.querySelectorAll('.search-item');
+            if (!items.length) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); dropdownIndex = Math.min(dropdownIndex + 1, items.length - 1); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); dropdownIndex = Math.max(dropdownIndex - 1, 0); }
+            else if (e.key === 'Enter' && dropdownIndex >= 0) { e.preventDefault(); items[dropdownIndex].click(); return; }
+            else if (e.key === 'Escape') { dropdown.classList.remove('visible'); clearHighlight(); searchInput.blur(); return; }
+            else return;
+            items.forEach((el, i) => { el.classList.toggle('active', i === dropdownIndex); });
+            if (dropdownIndex >= 0) highlightPath(items[dropdownIndex].dataset.id);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#search')) { dropdown.classList.remove('visible'); }
+        });
+
+        searchInput.addEventListener('focus', () => { if (searchInput.value) buildDropdown(searchInput.value); });
+
+        // Clear button behavior: empty input restores graph
+        searchInput.addEventListener('input', (e) => { if (!e.target.value) clearHighlight(); });
+
+        // Filter state
+        let activeTagFilter = 'all';
+        let activeSizeFilter = 'all';
+
+        function applyFilters() {
+            function matchesTagFilter(d) {
+                if (activeTagFilter === 'all') return true;
+                if (d.type !== 'Tool') return false;
+                return d.tags && d.tags.includes(activeTagFilter);
+            }
+
+            function matchesSizeFilter(d) {
+                if (activeSizeFilter === 'all') return true;
+                if (d.type !== 'Tool') return false;
+                return d.size === activeSizeFilter;
+            }
+
+            function matchesBothFilters(d) {
+                return matchesTagFilter(d) && matchesSizeFilter(d);
+            }
+
+            function hasMatchingChildren(nodeId) {
+                return data.nodes.some(n => {
+                    if (n.parent === nodeId && n.type === 'Tool') {
+                        return matchesBothFilters(n);
+                    }
+                    if (n.parent === nodeId && n.type === 'Subcategory') {
+                        return hasMatchingChildren(n.id);
+                    }
+                    return false;
+                });
+            }
+
+            const isFiltering = activeTagFilter !== 'all' || activeSizeFilter !== 'all';
+
+            nodeGroup.attr("opacity", d => {
+                if (!isFiltering) return 1;
+                if (d.type === 'Root') return 1;
+                if (d.type === 'Tool') return matchesBothFilters(d) ? 1 : 0.1;
+                return hasMatchingChildren(d.id) ? 1 : 0.1;
+            });
+
+            label.attr("opacity", d => {
+                if (!isFiltering) return 1;
+                if (d.type === 'Root') return 1;
+                if (d.type === 'Tool') return matchesBothFilters(d) ? 1 : 0.1;
+                return hasMatchingChildren(d.id) ? 1 : 0.1;
+            });
+
+            link.attr("opacity", d => {
+                if (!isFiltering) return 1;
+                return 0.15;
+            });
+        }
+
+        // Filter buttons - Tag filters
+        document.querySelectorAll('#filters button[data-filter-type="tag"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#filters button[data-filter-type="tag"]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeTagFilter = btn.dataset.filter;
+                applyFilters();
+            });
+        });
+
+        // Filter buttons - Size filters
+        document.querySelectorAll('#filters button[data-filter-type="size"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#filters button[data-filter-type="size"]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeSizeFilter = btn.dataset.filter;
+                applyFilters();
+            });
+        });
+
+        // Initial zoom - show dense graph at comfortable scale
+        svg.call(d3.zoom().transform, d3.zoomIdentity.translate(width/2, height/2).scale(0.7).translate(-width/2, -height/2));
+    </script>
+</body>
+</html>

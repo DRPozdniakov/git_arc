@@ -11,7 +11,7 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="AI Infrastructure Landscape 2026">
     <meta property="og:description" content="Interactive map of 340+ AI/ML tools across 28 categories. Frameworks, model providers, vector DBs, GPU clouds, and more.">
-    <meta property="og:url" content="https://drpozdniakov.github.io/ai-infrastructure-map/">
+    <meta property="og:url" content="https://drpozdniakov.github.io/git_arc/">
     <meta property="og:site_name" content="AI Infrastructure Map">
 
     <!-- Twitter Card -->
@@ -35,6 +35,7 @@
             position: relative;
             z-index: 10;
             animation: fadeInDown 0.6s ease-out;
+            overflow: visible;
         }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -125,7 +126,7 @@
         #filters button.active { background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); color: white; border-color: transparent; }
         #filters .filter-count { float: right; opacity: 0.6; }
 
-        #search { position: absolute; top: 16px; right: 30px; z-index: 20; animation: fadeIn 0.6s ease-out 0.4s both; }
+        #search { position: absolute; top: 16px; right: 30px; z-index: 20; animation: fadeIn 0.6s ease-out 0.4s both; left: auto; }
         #search input {
             padding: 10px 15px; width: 280px; background: rgba(26, 26, 46, 0.95);
             border: 1px solid #333; border-radius: 6px; color: #e0e0e0; font-size: 12px; backdrop-filter: blur(10px);
@@ -164,6 +165,49 @@
         ::-webkit-scrollbar-track { background: #1a1a2e; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #444; }
+
+        /* Mobile toggle button */
+        .mobile-toggle {
+            display: none; position: absolute; z-index: 30;
+            width: 36px; height: 36px; border-radius: 8px;
+            background: rgba(26, 26, 46, 0.95); border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff; font-size: 18px; cursor: pointer;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        .mobile-toggle:hover { border-color: #00d4ff; }
+
+        #toggle-filters { top: 100px; left: 12px; }
+        #toggle-legend { top: 100px; right: 12px; }
+
+        @media (max-width: 768px) {
+            #header { padding: 10px 12px 8px; overflow: visible; }
+            #header h1 { font-size: 18px; margin: 0; }
+            #header p { display: none; }
+            .stat-pills { gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+            .stat-pill { font-size: 10px; padding: 3px 8px; }
+
+            #search { position: relative; top: auto; right: auto; left: auto;
+                      margin: 8px 0 0; z-index: 20; }
+            #search input { width: 100%; font-size: 14px; padding: 10px 12px;
+                            box-sizing: border-box; }
+
+            .mobile-toggle { display: none; }
+            #filters { display: none !important; }
+            #legend { display: none !important; }
+            #size-legend { display: none !important; }
+
+            #stats { bottom: 8px; left: 50%; transform: translateX(-50%);
+                     padding: 6px 12px; font-size: 9px; }
+
+            #tooltip { max-width: 260px; font-size: 10px; }
+            #tooltip .name { font-size: 12px; }
+
+            .node-label { font-size: 7px; }
+            .root-label { font-size: 12px; }
+            .category-label { font-size: 9px; }
+            .subcategory-label { font-size: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -176,11 +220,13 @@
             <span class="stat-pill"><span class="num">60+</span> Startups</span>
             <span class="stat-pill">🖱️ All Clickable</span>
         </div>
+        <div id="search">
+            <input type="text" id="searchInput" placeholder="Search tools..." autocomplete="off">
+            <div id="search-dropdown"></div>
+        </div>
     </div>
-    <div id="search">
-        <input type="text" id="searchInput" placeholder="Search tools..." autocomplete="off">
-        <div id="search-dropdown"></div>
-    </div>
+    <button class="mobile-toggle" id="toggle-filters" title="Filters">☰</button>
+    <button class="mobile-toggle" id="toggle-legend" title="Legend">ℹ</button>
     <svg id="graph"></svg>
     <div id="legend">
         <h3>Node Types</h3>
@@ -1116,8 +1162,11 @@
             }
         });
 
+        const isMobile = window.innerWidth <= 768;
+        const headerEl = document.getElementById('header');
+        const headerH = headerEl ? headerEl.offsetHeight : 90;
         const width = window.innerWidth;
-        const height = window.innerHeight - 90;
+        const height = window.innerHeight - headerH;
 
         const svg = d3.select("#graph")
             .attr("width", width)
@@ -1126,9 +1175,10 @@
         const g = svg.append("g");
 
         // Zoom
-        svg.call(d3.zoom()
+        const zoom = d3.zoom()
             .scaleExtent([0.1, 4])
-            .on("zoom", (e) => g.attr("transform", e.transform)));
+            .on("zoom", (e) => g.attr("transform", e.transform));
+        svg.call(zoom);
 
         const simulation = d3.forceSimulation(data.nodes)
             .force("link", d3.forceLink(data.links).id(d => d.id).distance(d => {
@@ -1496,7 +1546,27 @@
         });
 
         // Initial zoom - show dense graph at comfortable scale
-        svg.call(d3.zoom().transform, d3.zoomIdentity.translate(width/2, height/2).scale(0.7).translate(-width/2, -height/2));
+        var initScale = isMobile ? 0.35 : 0.7;
+        svg.call(zoom.transform, d3.zoomIdentity.translate(width/2, height/2).scale(initScale).translate(-width/2, -height/2));
+
+        // Mobile toggle buttons
+        document.getElementById('toggle-filters').addEventListener('click', function() {
+            var f = document.getElementById('filters');
+            var l = document.getElementById('legend');
+            l.classList.remove('mobile-visible');
+            f.classList.toggle('mobile-visible');
+        });
+        document.getElementById('toggle-legend').addEventListener('click', function() {
+            var l = document.getElementById('legend');
+            var f = document.getElementById('filters');
+            f.classList.remove('mobile-visible');
+            l.classList.toggle('mobile-visible');
+        });
+        // Close panels when tapping the graph on mobile
+        document.getElementById('graph').addEventListener('click', function() {
+            document.getElementById('filters').classList.remove('mobile-visible');
+            document.getElementById('legend').classList.remove('mobile-visible');
+        });
     </script>
 </body>
 </html>

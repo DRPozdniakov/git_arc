@@ -2,7 +2,7 @@
 
 **Interactive map of 340+ AI/ML tools across 28 categories.**
 
-[**View Live**](https://drpozdniakov.github.io/ai-infrastructure-map/)
+[**View AI Map**](https://drpozdniakov.github.io/git_arc/) · [**View CV**](https://drpozdniakov.github.io/git_arc/output/cv.html)
 
 ## What It Is
 
@@ -17,7 +17,7 @@ A force-directed graph visualization of the entire AI/ML infrastructure ecosyste
 
 ## How to Use
 
-1. Open [the live page](https://drpozdniakov.github.io/ai-infrastructure-map/)
+1. Open [the live page](https://drpozdniakov.github.io/git_arc/)
 2. **Scroll** to zoom in/out
 3. **Drag** nodes to rearrange
 4. **Click** any tool to visit its website

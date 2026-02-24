@@ -3,21 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Infrastructure Landscape 2026 — Interactive Map of 340+ AI/ML Tools</title>
-    <meta name="description" content="Explore the complete AI/ML infrastructure ecosystem. 340+ tools across 28 categories — frameworks, model providers, vector databases, GPU clouds, and more. Interactive force-directed graph.">
+    <title>AI Infrastructure Landscape 2026 — Interactive Map of 440+ AI/ML Tools</title>
+    <meta name="description" content="Explore the complete AI/ML infrastructure ecosystem. 440+ tools across 28 categories — frameworks, model providers, vector databases, GPU clouds, robotics, and more. Interactive force-directed graph.">
     <meta name="author" content="DRPozdniakov">
 
     <!-- Open Graph / LinkedIn -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="AI Infrastructure Landscape 2026">
-    <meta property="og:description" content="Interactive map of 340+ AI/ML tools across 28 categories. Frameworks, model providers, vector DBs, GPU clouds, and more.">
+    <meta property="og:description" content="Interactive map of 440+ AI/ML tools across 28 categories. Frameworks, model providers, vector DBs, GPU clouds, robotics, and more.">
     <meta property="og:url" content="https://drpozdniakov.github.io/git_arc/">
     <meta property="og:site_name" content="AI Infrastructure Map">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="AI Infrastructure Landscape 2026">
-    <meta name="twitter:description" content="Interactive map of 340+ AI/ML tools across 28 categories.">
+    <meta name="twitter:description" content="Interactive map of 440+ AI/ML tools across 28 categories.">
 
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
@@ -215,9 +215,9 @@
         <h1>AI Infrastructure Landscape 2026</h1>
         <p>An interactive map of the entire AI/ML ecosystem — click any tool to visit its website</p>
         <div class="stat-pills">
-            <span class="stat-pill"><span class="num">340+</span> Tools</span>
+            <span class="stat-pill"><span class="num">440+</span> Tools</span>
             <span class="stat-pill"><span class="num">28</span> Categories</span>
-            <span class="stat-pill"><span class="num">60+</span> Startups</span>
+            <span class="stat-pill"><span class="num">80+</span> Startups</span>
             <span class="stat-pill">🖱️ All Clickable</span>
         </div>
         <div id="search">
@@ -244,13 +244,13 @@
     </div>
     <div id="filters">
         <h3>Filter by Type</h3>
-        <button class="active" data-filter="all" data-filter-type="tag">All Tools <span class="filter-count">280+</span></button>
-        <button data-filter="llm" data-filter-type="tag">LLM & Agents <span class="filter-count">45</span></button>
-        <button data-filter="training" data-filter-type="tag">Training & Fine-tuning <span class="filter-count">40</span></button>
-        <button data-filter="infra" data-filter-type="tag">Infrastructure <span class="filter-count">50</span></button>
-        <button data-filter="data" data-filter-type="tag">Data & Storage <span class="filter-count">45</span></button>
-        <button data-filter="observability" data-filter-type="tag">Observability <span class="filter-count">35</span></button>
-        <button data-filter="multimodal" data-filter-type="tag">Multimodal <span class="filter-count">40</span></button>
+        <button class="active" data-filter="all" data-filter-type="tag">All Tools <span class="filter-count">450+</span></button>
+        <button data-filter="llm" data-filter-type="tag">LLM & Agents <span class="filter-count">70</span></button>
+        <button data-filter="training" data-filter-type="tag">Training & Fine-tuning <span class="filter-count">65</span></button>
+        <button data-filter="infra" data-filter-type="tag">Infrastructure <span class="filter-count">70</span></button>
+        <button data-filter="data" data-filter-type="tag">Data & Storage <span class="filter-count">50</span></button>
+        <button data-filter="observability" data-filter-type="tag">Observability <span class="filter-count">40</span></button>
+        <button data-filter="multimodal" data-filter-type="tag">Multimodal <span class="filter-count">60</span></button>
         <button data-filter="mcp" data-filter-type="tag">MCP Ecosystem <span class="filter-count">20</span></button>
 
         <h3 style="margin-top: 20px;">Filter by Size</h3>
@@ -272,6 +272,7 @@
         // Icon URL mappings using LobeHub CDN and Simple Icons
         const LOBE_CDN = "https://unpkg.com/@lobehub/icons-static-svg@latest/icons";
         const SIMPLE_CDN = "https://cdn.simpleicons.org";
+        const FAVICON = (domain) => `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
 
         const iconMap = {
             // ============ MODEL PROVIDERS ============
@@ -682,6 +683,153 @@
             cerebrium: `${LOBE_CDN}/cerebrium.svg`,
             mystic: `${LOBE_CDN}/mystic.svg`,
             twelve_labs: `${LOBE_CDN}/twelvelabs.svg`,
+
+            // ============ ROBOTICS AI ============
+            rt2: `${LOBE_CDN}/google.svg`,
+            openvla: FAVICON("openvla.github.io"),
+            octo: FAVICON("octo-models.github.io"),
+            pi0: FAVICON("physicalintelligence.company"),
+            groot: `${SIMPLE_CDN}/nvidia`,
+            gemini_robotics: `${LOBE_CDN}/gemini.svg`,
+            helix: FAVICON("figure.ai"),
+            diffusion_policy: FAVICON("diffusion-policy.cs.columbia.edu"),
+            cogact: `${LOBE_CDN}/microsoft.svg`,
+            spatialvla: FAVICON("github.com"),
+            ros2: `${SIMPLE_CDN}/ros`,
+            isaac_sim: `${SIMPLE_CDN}/nvidia`,
+            isaac_lab: `${SIMPLE_CDN}/nvidia`,
+            mujoco: `${LOBE_CDN}/deepmind.svg`,
+            genesis_sim: FAVICON("genesis-embodied-ai.github.io"),
+            gazebo: `${SIMPLE_CDN}/ros`,
+            pybullet: `${SIMPLE_CDN}/python`,
+            drake: FAVICON("drake.mit.edu"),
+            robosuite: FAVICON("robosuite.ai"),
+            sapien: FAVICON("sapien.ucsd.edu"),
+            maniskill: FAVICON("maniskill.ai"),
+            lerobot: `${LOBE_CDN}/huggingface.svg`,
+            openx: `${LOBE_CDN}/google.svg`,
+            mimicgen: FAVICON("mimicgen.github.io"),
+            robocasa: FAVICON("robocasa.ai"),
+            libero: FAVICON("libero-project.github.io"),
+
+            // ============ NEW GPU CLOUD ============
+            nebius: FAVICON("nebius.com"),
+            crusoe: FAVICON("crusoe.ai"),
+            cerebras_cloud: FAVICON("cerebras.ai"),
+            sambanova: FAVICON("sambanova.ai"),
+            nscale: FAVICON("nscale.com"),
+            vultr: `${SIMPLE_CDN}/vultr`,
+            latitude: FAVICON("latitude.sh"),
+            datacrunch: FAVICON("datacrunch.io"),
+            genesis_cloud: FAVICON("genesiscloud.com"),
+            deepinfra: FAVICON("deepinfra.com"),
+            gmicloud: FAVICON("gmicloud.ai"),
+            hyperbolic: FAVICON("hyperbolic.ai"),
+
+            // ============ NEW MODEL PROVIDERS ============
+            ai21: `${LOBE_CDN}/ai21.svg`,
+            reka: FAVICON("reka.ai"),
+            writer: FAVICON("writer.com"),
+            zhipu: `${LOBE_CDN}/chatglm.svg`,
+            baichuan: `${LOBE_CDN}/baichuan.svg`,
+            "01ai": `${LOBE_CDN}/yi.svg`,
+            minimax: `${LOBE_CDN}/minimax.svg`,
+            moonshot: `${LOBE_CDN}/moonshot.svg`,
+            aleph_alpha: FAVICON("aleph-alpha.com"),
+            inflection: FAVICON("inflection.ai"),
+            stability_provider: `${LOBE_CDN}/stability.svg`,
+            meta_llama: `${LOBE_CDN}/meta.svg`,
+            nous: FAVICON("nousresearch.com"),
+
+            // ============ NEW AGENT FRAMEWORKS ============
+            openai_agents: `${LOBE_CDN}/openai.svg`,
+            google_adk: `${LOBE_CDN}/google.svg`,
+            claude_sdk: `${LOBE_CDN}/anthropic.svg`,
+            vercel_ai: `${LOBE_CDN}/vercel.svg`,
+            ag2: FAVICON("ag2.ai"),
+            metagpt: FAVICON("deepwisdom.ai"),
+            camelai: FAVICON("camel-ai.org"),
+            phidata: `${LOBE_CDN}/phidata.svg`,
+            llama_stack: `${LOBE_CDN}/meta.svg`,
+            semantic_router: FAVICON("aurelio.ai"),
+            controlflow: FAVICON("controlflow.ai"),
+            toolhouse: FAVICON("toolhouse.ai"),
+            arcade: FAVICON("arcade.dev"),
+
+            // ============ NEW CODE ASSISTANTS ============
+            devin: FAVICON("devin.ai"),
+            claude_code: `${LOBE_CDN}/anthropic.svg`,
+            boltnew: `${SIMPLE_CDN}/stackblitz`,
+            lovable: FAVICON("lovable.dev"),
+            v0: `${LOBE_CDN}/vercel.svg`,
+            replit_agent: `${SIMPLE_CDN}/replit`,
+            gemini_code: `${LOBE_CDN}/gemini.svg`,
+            jetbrains_ai: `${SIMPLE_CDN}/jetbrains`,
+            augment: FAVICON("augmentcode.com"),
+            trae: FAVICON("trae.ai"),
+            zed_ai: `${SIMPLE_CDN}/zedindustries`,
+            phind: FAVICON("phind.com"),
+            swe_agent: FAVICON("swe-agent.com"),
+            qodo: FAVICON("qodo.ai"),
+
+            // ============ NEW VISION ============
+            yolo: FAVICON("ultralytics.com"),
+            dinov2: `${LOBE_CDN}/meta.svg`,
+            grounding_dino: FAVICON("github.com"),
+            internvl: FAVICON("github.com"),
+            moondream: FAVICON("moondream.ai"),
+            depth_anything: FAVICON("depth-anything.github.io"),
+
+            // ============ NEW AUDIO/MUSIC ============
+            suno: `${LOBE_CDN}/suno.svg`,
+            udio: FAVICON("udio.com"),
+            musicgen: `${LOBE_CDN}/meta.svg`,
+            stable_audio: `${LOBE_CDN}/stability.svg`,
+            fish_speech: FAVICON("fish.audio"),
+            kokoro: `${LOBE_CDN}/huggingface.svg`,
+            openvoice: FAVICON("github.com"),
+            dia: FAVICON("github.com"),
+
+            // ============ NEW IMAGE GEN ============
+            leonardo: FAVICON("leonardo.ai"),
+            firefly: `${SIMPLE_CDN}/adobe`,
+            imagen: `${LOBE_CDN}/google.svg`,
+            recraft: FAVICON("recraft.ai"),
+
+            // ============ NEW VIDEO AI ============
+            veo: `${LOBE_CDN}/google.svg`,
+            wan_video: FAVICON("github.com"),
+            cogvideo: `${LOBE_CDN}/chatglm.svg`,
+            hailuo: `${LOBE_CDN}/minimax.svg`,
+
+            // ============ NEW RESEARCH ============
+            tavily: FAVICON("tavily.com"),
+            you: FAVICON("you.com"),
+            scispace: FAVICON("typeset.io"),
+            semantic_scholar: `${SIMPLE_CDN}/semanticscholar`,
+            storm: FAVICON("github.com"),
+
+            // ============ NEW COMMUNICATION ============
+            vocode: FAVICON("vocode.dev"),
+            pipecat: FAVICON("pipecat.ai"),
+            ultravox: FAVICON("ultravox.ai"),
+
+            // ============ NEW INTERFACES ============
+            copilotkit: FAVICON("copilotkit.ai"),
+            anythingllm: FAVICON("anythingllm.com"),
+            lobechat: `${LOBE_CDN}/lobehub.svg`,
+            jan: FAVICON("jan.ai"),
+
+            // ============ NEW EVAL/SAFETY ============
+            evidently: FAVICON("evidentlyai.com"),
+            patronus: FAVICON("patronus.ai"),
+            galileo: FAVICON("galileo.ai"),
+            arthur: FAVICON("arthur.ai"),
+
+            // ============ NEW VECTOR DBs ============
+            astradb: `${SIMPLE_CDN}/datastax`,
+            mongodb_vector: `${SIMPLE_CDN}/mongodb`,
+            typesense: `${SIMPLE_CDN}/typesense`,
         };
 
         const data = {
@@ -717,6 +865,7 @@
                 { id: "cat_cloud", name: "Cloud Platforms", type: "Category", desc: "Managed ML services" },
                 { id: "cat_comm", name: "AI Communication", type: "Category", desc: "Voice, SMS, real-time" },
                 { id: "cat_video", name: "Video AI", type: "Category", desc: "Video generation" },
+                { id: "cat_robotics", name: "Robotics AI", type: "Category", desc: "Robot foundation models & simulation" },
 
                 // ========== SUBCATEGORIES ==========
                 { id: "sub_pytorch", name: "PyTorch Ecosystem", type: "Subcategory", parent: "cat_dl" },
@@ -728,6 +877,10 @@
                 { id: "sub_mcp_servers", name: "MCP Servers", type: "Subcategory", parent: "cat_mcp" },
                 { id: "sub_finetune_tools", name: "Fine-Tune Tools", type: "Subcategory", parent: "cat_finetune" },
                 { id: "sub_finetune_tech", name: "Techniques", type: "Subcategory", parent: "cat_finetune" },
+                { id: "sub_vla", name: "VLA Models", type: "Subcategory", parent: "cat_robotics" },
+                { id: "sub_robosim", name: "Simulation", type: "Subcategory", parent: "cat_robotics" },
+                { id: "sub_robolearn", name: "Robot Learning", type: "Subcategory", parent: "cat_robotics" },
+                { id: "sub_music", name: "Music AI", type: "Subcategory", parent: "cat_multimodal" },
 
                 // ========== TOOLS WITH URLs AND SIZES ==========
 
@@ -1147,7 +1300,160 @@
                 // Model Serving Startups
                 { id: "t_inferless", name: "Inferless", type: "Tool", parent: "cat_serving", detection: "inferless", desc: "Serverless ML inference", tags: ["infra"], size: "tiny", url: "https://inferless.com" },
                 { id: "t_cerebrium", name: "Cerebrium", type: "Tool", parent: "cat_serving", detection: "cerebrium", desc: "Serverless GPU inference", tags: ["infra"], size: "tiny", url: "https://cerebrium.ai" },
-                { id: "t_mystic", name: "Mystic", type: "Tool", parent: "cat_serving", detection: "mystic", desc: "ML model deployment", tags: ["infra"], size: "tiny", url: "https://mystic.ai" }
+                { id: "t_mystic", name: "Mystic", type: "Tool", parent: "cat_serving", detection: "mystic", desc: "ML model deployment", tags: ["infra"], size: "tiny", url: "https://mystic.ai" },
+
+                // ========== NEW: ROBOTICS AI ==========
+
+                // VLA Models
+                { id: "t_rt2", name: "RT-2", type: "Tool", parent: "sub_vla", detection: "rt2", desc: "Google vision-language-action model", tags: ["training", "multimodal"], size: "large", url: "https://robotics-transformer2.github.io" },
+                { id: "t_openvla", name: "OpenVLA", type: "Tool", parent: "sub_vla", detection: "openvla", desc: "Open 7B vision-language-action model", tags: ["training", "multimodal"], size: "medium", url: "https://openvla.github.io" },
+                { id: "t_octo", name: "Octo", type: "Tool", parent: "sub_vla", detection: "octo", desc: "Open generalist robot policy", tags: ["training", "multimodal"], size: "medium", url: "https://octo-models.github.io" },
+                { id: "t_pi0", name: "pi0", type: "Tool", parent: "sub_vla", detection: "pi0", desc: "Physical Intelligence foundation model", tags: ["training", "multimodal"], size: "large", url: "https://www.physicalintelligence.company/blog/pi0" },
+                { id: "t_groot", name: "GR00T N1", type: "Tool", parent: "sub_vla", detection: "groot", desc: "NVIDIA humanoid robot model", tags: ["training", "multimodal", "infra"], size: "large", url: "https://developer.nvidia.com/isaac/groot" },
+                { id: "t_gemini_robotics", name: "Gemini Robotics", type: "Tool", parent: "sub_vla", detection: "gemini-robotics", desc: "Google DeepMind VLA model", tags: ["training", "multimodal"], size: "large", url: "https://deepmind.google/models/gemini-robotics" },
+                { id: "t_helix", name: "Helix", type: "Tool", parent: "sub_vla", detection: "helix", desc: "Figure AI dual-system VLA", tags: ["training", "multimodal"], size: "large", url: "https://www.figure.ai/news/helix" },
+                { id: "t_diffusion_policy", name: "Diffusion Policy", type: "Tool", parent: "sub_vla", detection: "diffusion-policy", desc: "Visuomotor action diffusion policy", tags: ["training", "multimodal"], size: "medium", url: "https://diffusion-policy.cs.columbia.edu" },
+                { id: "t_cogact", name: "CogACT", type: "Tool", parent: "sub_vla", detection: "cogact", desc: "Microsoft multimodal robot model", tags: ["training", "multimodal"], size: "large", url: "https://github.com/microsoft/CogACT" },
+                { id: "t_spatialvla", name: "SpatialVLA", type: "Tool", parent: "sub_vla", detection: "spatialvla", desc: "Spatial-enhanced VLA model", tags: ["training", "multimodal", "data"], size: "medium", url: "https://github.com/SpatialVLA/SpatialVLA" },
+
+                // Robotics Simulation
+                { id: "t_ros2", name: "ROS 2", type: "Tool", parent: "sub_robosim", detection: "rclpy", desc: "Standard robot middleware", tags: ["infra"], size: "large", url: "https://www.ros.org" },
+                { id: "t_isaac_sim", name: "Isaac Sim", type: "Tool", parent: "sub_robosim", detection: "isaacsim", desc: "NVIDIA robot simulation", tags: ["infra", "training", "data"], size: "large", url: "https://developer.nvidia.com/isaac/sim" },
+                { id: "t_isaac_lab", name: "Isaac Lab", type: "Tool", parent: "sub_robosim", detection: "isaaclab", desc: "NVIDIA robot learning framework", tags: ["infra", "training"], size: "large", url: "https://github.com/isaac-sim/IsaacLab" },
+                { id: "t_mujoco", name: "MuJoCo", type: "Tool", parent: "sub_robosim", detection: "mujoco", desc: "DeepMind physics engine", tags: ["infra", "training"], size: "large", url: "https://mujoco.org" },
+                { id: "t_genesis_sim", name: "Genesis Sim", type: "Tool", parent: "sub_robosim", detection: "genesis", desc: "Ultra-fast robot simulation", tags: ["infra", "training"], size: "medium", url: "https://genesis-embodied-ai.github.io" },
+                { id: "t_gazebo", name: "Gazebo", type: "Tool", parent: "sub_robosim", detection: "gazebo", desc: "ROS-integrated simulator", tags: ["infra"], size: "large", url: "https://gazebosim.org" },
+                { id: "t_pybullet", name: "PyBullet", type: "Tool", parent: "sub_robosim", detection: "pybullet", desc: "Python physics simulation", tags: ["infra", "training"], size: "medium", url: "https://pybullet.org" },
+                { id: "t_drake", name: "Drake", type: "Tool", parent: "sub_robosim", detection: "pydrake", desc: "MIT model-based robotics toolkit", tags: ["infra", "training"], size: "medium", url: "https://drake.mit.edu" },
+                { id: "t_robosuite", name: "robosuite", type: "Tool", parent: "sub_robosim", detection: "robosuite", desc: "Robot learning simulation benchmark", tags: ["infra", "training"], size: "medium", url: "https://robosuite.ai" },
+                { id: "t_sapien", name: "SAPIEN", type: "Tool", parent: "sub_robosim", detection: "sapien", desc: "Articulated object simulator", tags: ["infra", "training"], size: "medium", url: "https://sapien.ucsd.edu" },
+                { id: "t_maniskill", name: "ManiSkill", type: "Tool", parent: "sub_robosim", detection: "maniskill", desc: "GPU manipulation benchmark", tags: ["infra", "training", "data"], size: "medium", url: "https://maniskill.ai" },
+
+                // Robot Learning
+                { id: "t_lerobot", name: "LeRobot", type: "Tool", parent: "sub_robolearn", detection: "lerobot", desc: "HuggingFace robot learning library", tags: ["training", "data", "infra"], size: "medium", url: "https://github.com/huggingface/lerobot" },
+                { id: "t_openx", name: "Open X-Embodiment", type: "Tool", parent: "sub_robolearn", detection: "openx", desc: "Cross-embodiment robot dataset", tags: ["data", "training"], size: "large", url: "https://robotics-transformer-x.github.io" },
+                { id: "t_mimicgen", name: "MimicGen", type: "Tool", parent: "sub_robolearn", detection: "mimicgen", desc: "Scalable robot data generation", tags: ["data", "training"], size: "medium", url: "https://mimicgen.github.io" },
+                { id: "t_robocasa", name: "RoboCasa", type: "Tool", parent: "sub_robolearn", detection: "robocasa", desc: "Household task simulation", tags: ["training", "data", "infra"], size: "medium", url: "https://robocasa.ai" },
+                { id: "t_libero", name: "LIBERO", type: "Tool", parent: "sub_robolearn", detection: "libero", desc: "Lifelong robot learning benchmark", tags: ["training", "data"], size: "small", url: "https://libero-project.github.io" },
+
+                // ========== NEW: GPU CLOUD ADDITIONS ==========
+                { id: "t_nebius", name: "Nebius AI", type: "Tool", parent: "cat_gpu", detection: "nebius", desc: "Full-stack AI cloud (Yandex spinoff)", tags: ["infra"], size: "large", url: "https://nebius.com" },
+                { id: "t_crusoe", name: "Crusoe Energy", type: "Tool", parent: "cat_gpu", detection: "crusoe", desc: "Clean energy AI GPU cloud", tags: ["infra"], size: "large", url: "https://crusoe.ai" },
+                { id: "t_cerebras_cloud", name: "Cerebras Cloud", type: "Tool", parent: "cat_gpu", detection: "cerebras", desc: "Wafer-scale chip inference", tags: ["infra"], size: "medium", url: "https://cerebras.ai" },
+                { id: "t_sambanova", name: "SambaNova", type: "Tool", parent: "cat_gpu", detection: "sambanova", desc: "Custom RDU AI inference cloud", tags: ["infra"], size: "medium", url: "https://sambanova.ai" },
+                { id: "t_nscale", name: "Nscale", type: "Tool", parent: "cat_gpu", detection: "nscale", desc: "European AI hyperscaler", tags: ["infra"], size: "medium", url: "https://nscale.com" },
+                { id: "t_vultr", name: "Vultr GPU", type: "Tool", parent: "cat_gpu", detection: "vultr", desc: "Affordable global GPU cloud", tags: ["infra"], size: "large", url: "https://www.vultr.com" },
+                { id: "t_latitude", name: "Latitude.sh", type: "Tool", parent: "cat_gpu", detection: "latitude", desc: "Bare-metal GPU cloud", tags: ["infra"], size: "medium", url: "https://www.latitude.sh" },
+                { id: "t_datacrunch", name: "DataCrunch", type: "Tool", parent: "cat_gpu", detection: "datacrunch", desc: "European renewable GPU cloud", tags: ["infra"], size: "small", url: "https://datacrunch.io" },
+                { id: "t_genesis_cloud", name: "Genesis Cloud", type: "Tool", parent: "cat_gpu", detection: "genesiscloud", desc: "EU sustainable GPU cloud", tags: ["infra"], size: "small", url: "https://www.genesiscloud.com" },
+                { id: "t_deepinfra", name: "DeepInfra", type: "Tool", parent: "cat_gpu", detection: "deepinfra", desc: "Serverless AI inference API", tags: ["infra"], size: "small", url: "https://deepinfra.com" },
+                { id: "t_gmicloud", name: "GMI Cloud", type: "Tool", parent: "cat_gpu", detection: "gmicloud", desc: "High-performance H100/H200 cloud", tags: ["infra"], size: "medium", url: "https://www.gmicloud.ai" },
+                { id: "t_hyperbolic", name: "Hyperbolic", type: "Tool", parent: "cat_gpu", detection: "hyperbolic", desc: "GPU rentals and AI inference", tags: ["infra"], size: "small", url: "https://www.hyperbolic.ai" },
+
+                // ========== NEW: MODEL PROVIDERS ==========
+                { id: "t_ai21", name: "AI21 Labs", type: "Tool", parent: "cat_providers", detection: "ai21", desc: "Jamba hybrid SSM-Transformer", tags: ["llm"], size: "medium", url: "https://www.ai21.com" },
+                { id: "t_reka", name: "Reka AI", type: "Tool", parent: "cat_providers", detection: "reka", desc: "Multimodal frontier models", tags: ["llm", "multimodal"], size: "small", url: "https://www.reka.ai" },
+                { id: "t_writer", name: "Writer", type: "Tool", parent: "cat_providers", detection: "writer", desc: "Palmyra enterprise LLMs", tags: ["llm"], size: "medium", url: "https://writer.com" },
+                { id: "t_zhipu", name: "Zhipu AI", type: "Tool", parent: "cat_providers", detection: "zhipuai", desc: "ChatGLM bilingual models", tags: ["llm"], size: "medium", url: "https://www.zhipuai.cn" },
+                { id: "t_baichuan", name: "Baichuan", type: "Tool", parent: "cat_providers", detection: "baichuan", desc: "Chinese open-source LLMs", tags: ["llm"], size: "medium", url: "https://www.baichuan-ai.com" },
+                { id: "t_01ai", name: "01.AI", type: "Tool", parent: "cat_providers", detection: "yi", desc: "Yi series open-weight models", tags: ["llm"], size: "medium", url: "https://www.01.ai" },
+                { id: "t_minimax", name: "MiniMax", type: "Tool", parent: "cat_providers", detection: "minimax", desc: "MoE models with long context", tags: ["llm"], size: "medium", url: "https://www.minimaxi.com" },
+                { id: "t_moonshot", name: "Moonshot AI", type: "Tool", parent: "cat_providers", detection: "moonshot", desc: "Kimi long-context models", tags: ["llm"], size: "medium", url: "https://www.moonshot.cn" },
+                { id: "t_aleph_alpha", name: "Aleph Alpha", type: "Tool", parent: "cat_providers", detection: "aleph-alpha", desc: "European sovereign AI", tags: ["llm"], size: "medium", url: "https://aleph-alpha.com" },
+                { id: "t_inflection", name: "Inflection AI", type: "Tool", parent: "cat_providers", detection: "inflection", desc: "Pi conversational AI", tags: ["llm"], size: "medium", url: "https://inflection.ai" },
+                { id: "t_stability_provider", name: "Stability AI", type: "Tool", parent: "cat_providers", detection: "stability-sdk", desc: "Open generative AI models", tags: ["llm", "multimodal"], size: "large", url: "https://stability.ai" },
+                { id: "t_meta_llama", name: "Meta Llama", type: "Tool", parent: "cat_providers", detection: "llama", desc: "Open-weight Llama models", tags: ["llm"], size: "large", url: "https://llama.meta.com" },
+                { id: "t_nous", name: "NousResearch", type: "Tool", parent: "cat_providers", detection: "nous", desc: "Community fine-tuned open models", tags: ["llm"], size: "small", url: "https://nousresearch.com" },
+
+                // ========== NEW: AGENT FRAMEWORKS ==========
+                { id: "t_openai_agents", name: "OpenAI Agents SDK", type: "Tool", parent: "cat_agents", detection: "openai-agents", desc: "Official OpenAI agent framework", tags: ["llm"], size: "large", url: "https://openai.github.io/openai-agents-python" },
+                { id: "t_google_adk", name: "Google ADK", type: "Tool", parent: "cat_agents", detection: "google-adk", desc: "Google multi-agent dev kit", tags: ["llm"], size: "large", url: "https://google.github.io/adk-docs" },
+                { id: "t_claude_sdk", name: "Claude Agent SDK", type: "Tool", parent: "cat_agents", detection: "claude-code-sdk", desc: "Anthropic agentic coding SDK", tags: ["llm"], size: "large", url: "https://github.com/anthropics/claude-code" },
+                { id: "t_vercel_ai", name: "Vercel AI SDK", type: "Tool", parent: "cat_agents", detection: "ai", desc: "TypeScript AI app framework", tags: ["llm", "infra"], size: "large", url: "https://sdk.vercel.ai" },
+                { id: "t_ag2", name: "AG2", type: "Tool", parent: "cat_agents", detection: "ag2", desc: "AutoGen successor multi-agent", tags: ["llm"], size: "medium", url: "https://ag2.ai" },
+                { id: "t_metagpt", name: "MetaGPT", type: "Tool", parent: "cat_agents", detection: "metagpt", desc: "Multi-agent software dev", tags: ["llm"], size: "medium", url: "https://github.com/geekan/MetaGPT" },
+                { id: "t_camelai", name: "CAMEL-AI", type: "Tool", parent: "cat_agents", detection: "camel", desc: "Role-playing communicative agents", tags: ["llm"], size: "small", url: "https://www.camel-ai.org" },
+                { id: "t_phidata", name: "Phidata", type: "Tool", parent: "cat_agents", detection: "phidata", desc: "Agent framework with memory", tags: ["llm"], size: "medium", url: "https://www.phidata.com" },
+                { id: "t_llama_stack", name: "Llama Stack", type: "Tool", parent: "cat_agents", detection: "llama-stack", desc: "Meta unified agent APIs", tags: ["llm"], size: "medium", url: "https://llama-stack.readthedocs.io" },
+                { id: "t_semantic_router", name: "Semantic Router", type: "Tool", parent: "cat_agents", detection: "semantic-router", desc: "Fast semantic decision routing", tags: ["llm"], size: "small", url: "https://github.com/aurelio-labs/semantic-router" },
+                { id: "t_controlflow", name: "ControlFlow", type: "Tool", parent: "cat_agents", detection: "controlflow", desc: "Task-centric agent orchestration", tags: ["llm"], size: "small", url: "https://controlflow.ai" },
+                { id: "t_toolhouse", name: "Toolhouse", type: "Tool", parent: "cat_agents", detection: "toolhouse", desc: "Tool execution for AI agents", tags: ["llm"], size: "small", url: "https://toolhouse.ai" },
+                { id: "t_arcade", name: "Arcade AI", type: "Tool", parent: "cat_agents", detection: "arcade", desc: "Tool execution platform for LLMs", tags: ["llm"], size: "small", url: "https://www.arcade.dev" },
+
+                // ========== NEW: CODE ASSISTANTS ==========
+                { id: "t_devin", name: "Devin", type: "Tool", parent: "cat_code", detection: "devin", desc: "Autonomous AI software engineer", tags: ["llm"], size: "large", url: "https://devin.ai" },
+                { id: "t_claude_code", name: "Claude Code", type: "Tool", parent: "cat_code", detection: "claude-code", desc: "Anthropic agentic coding CLI", tags: ["llm"], size: "large", url: "https://claude.ai/code" },
+                { id: "t_boltnew", name: "Bolt.new", type: "Tool", parent: "cat_code", detection: "bolt", desc: "Browser full-stack app builder", tags: ["llm"], size: "large", url: "https://bolt.new" },
+                { id: "t_lovable", name: "Lovable", type: "Tool", parent: "cat_code", detection: "lovable", desc: "AI full-stack app generator", tags: ["llm"], size: "medium", url: "https://lovable.dev" },
+                { id: "t_v0", name: "v0 by Vercel", type: "Tool", parent: "cat_code", detection: "v0", desc: "AI UI component generator", tags: ["llm"], size: "medium", url: "https://v0.dev" },
+                { id: "t_replit_agent", name: "Replit Agent", type: "Tool", parent: "cat_code", detection: "replit", desc: "AI builds and deploys apps", tags: ["llm"], size: "large", url: "https://replit.com/agent" },
+                { id: "t_gemini_code", name: "Gemini Code Assist", type: "Tool", parent: "cat_code", detection: "gemini-code", desc: "Google enterprise code AI", tags: ["llm"], size: "large", url: "https://cloud.google.com/gemini/docs/codeassist" },
+                { id: "t_jetbrains_ai", name: "JetBrains AI", type: "Tool", parent: "cat_code", detection: "jetbrains-ai", desc: "JetBrains IDE AI assistant", tags: ["llm"], size: "large", url: "https://jetbrains.com/ai" },
+                { id: "t_augment", name: "Augment Code", type: "Tool", parent: "cat_code", detection: "augment", desc: "Context-aware codebase AI", tags: ["llm"], size: "medium", url: "https://www.augmentcode.com" },
+                { id: "t_trae", name: "Trae", type: "Tool", parent: "cat_code", detection: "trae", desc: "ByteDance AI IDE", tags: ["llm"], size: "medium", url: "https://trae.ai" },
+                { id: "t_zed_ai", name: "Zed AI", type: "Tool", parent: "cat_code", detection: "zed", desc: "AI-native collaborative editor", tags: ["llm"], size: "medium", url: "https://zed.dev" },
+                { id: "t_phind", name: "Phind", type: "Tool", parent: "cat_code", detection: "phind", desc: "AI search for developers", tags: ["llm"], size: "medium", url: "https://www.phind.com" },
+                { id: "t_swe_agent", name: "SWE-agent", type: "Tool", parent: "cat_code", detection: "swe-agent", desc: "Autonomous GitHub issue solver", tags: ["llm"], size: "small", url: "https://swe-agent.com" },
+                { id: "t_qodo", name: "Qodo", type: "Tool", parent: "cat_code", detection: "qodo", desc: "AI testing and code quality", tags: ["llm"], size: "small", url: "https://www.qodo.ai" },
+
+                // ========== NEW: VISION MODELS ==========
+                { id: "t_yolo", name: "YOLO/Ultralytics", type: "Tool", parent: "sub_vision", detection: "ultralytics", desc: "Real-time object detection", tags: ["multimodal"], size: "large", url: "https://ultralytics.com" },
+                { id: "t_dinov2", name: "DINOv2", type: "Tool", parent: "sub_vision", detection: "dinov2", desc: "Meta self-supervised vision", tags: ["multimodal"], size: "large", url: "https://github.com/facebookresearch/dinov2" },
+                { id: "t_grounding_dino", name: "Grounding DINO", type: "Tool", parent: "sub_vision", detection: "groundingdino", desc: "Open-set object detection", tags: ["multimodal"], size: "medium", url: "https://github.com/IDEA-Research/GroundingDINO" },
+                { id: "t_internvl", name: "InternVL", type: "Tool", parent: "sub_vision", detection: "internvl", desc: "Open vision-language model", tags: ["multimodal", "llm"], size: "large", url: "https://github.com/OpenGVLab/InternVL" },
+                { id: "t_moondream", name: "Moondream", type: "Tool", parent: "sub_vision", detection: "moondream", desc: "Tiny edge vision-language model", tags: ["multimodal"], size: "small", url: "https://moondream.ai" },
+                { id: "t_depth_anything", name: "Depth Anything", type: "Tool", parent: "sub_vision", detection: "depth-anything", desc: "Universal monocular depth estimation", tags: ["multimodal"], size: "medium", url: "https://depth-anything.github.io" },
+
+                // ========== NEW: AUDIO/MUSIC ==========
+                { id: "t_suno", name: "Suno", type: "Tool", parent: "sub_music", detection: "suno", desc: "AI music generation platform", tags: ["multimodal"], size: "large", url: "https://suno.com" },
+                { id: "t_udio", name: "Udio", type: "Tool", parent: "sub_music", detection: "udio", desc: "AI music creation tool", tags: ["multimodal"], size: "medium", url: "https://udio.com" },
+                { id: "t_musicgen", name: "MusicGen", type: "Tool", parent: "sub_music", detection: "musicgen", desc: "Meta text-to-music model", tags: ["multimodal"], size: "medium", url: "https://audiocraft.metademolab.com" },
+                { id: "t_stable_audio", name: "Stable Audio", type: "Tool", parent: "sub_music", detection: "stable-audio", desc: "Stability AI audio generation", tags: ["multimodal"], size: "medium", url: "https://stability.ai/stable-audio" },
+                { id: "t_fish_speech", name: "Fish Speech", type: "Tool", parent: "sub_audio", detection: "fish-speech", desc: "Open multilingual TTS", tags: ["multimodal"], size: "medium", url: "https://fish.audio" },
+                { id: "t_kokoro", name: "Kokoro TTS", type: "Tool", parent: "sub_audio", detection: "kokoro", desc: "Lightweight open-source TTS", tags: ["multimodal"], size: "small", url: "https://huggingface.co/hexgrad/Kokoro-82M" },
+                { id: "t_openvoice", name: "OpenVoice", type: "Tool", parent: "sub_audio", detection: "openvoice", desc: "Instant voice cloning", tags: ["multimodal"], size: "small", url: "https://github.com/myshell-ai/OpenVoice" },
+                { id: "t_dia", name: "Dia", type: "Tool", parent: "sub_audio", detection: "dia", desc: "Nari Labs realistic dialogue TTS", tags: ["multimodal"], size: "small", url: "https://github.com/nari-labs/dia" },
+
+                // ========== NEW: IMAGE GENERATION ==========
+                { id: "t_leonardo", name: "Leonardo AI", type: "Tool", parent: "sub_imagegen", detection: "leonardo", desc: "Creative AI image platform", tags: ["multimodal"], size: "large", url: "https://leonardo.ai" },
+                { id: "t_firefly", name: "Adobe Firefly", type: "Tool", parent: "sub_imagegen", detection: "firefly", desc: "Adobe generative AI suite", tags: ["multimodal"], size: "large", url: "https://firefly.adobe.com" },
+                { id: "t_imagen", name: "Imagen", type: "Tool", parent: "sub_imagegen", detection: "imagen", desc: "Google text-to-image model", tags: ["multimodal"], size: "large", url: "https://deepmind.google/technologies/imagen-3" },
+                { id: "t_recraft", name: "Recraft", type: "Tool", parent: "sub_imagegen", detection: "recraft", desc: "Vector and brand image AI", tags: ["multimodal"], size: "medium", url: "https://recraft.ai" },
+
+                // ========== NEW: VIDEO AI ==========
+                { id: "t_veo", name: "Veo", type: "Tool", parent: "cat_video", detection: "veo", desc: "Google DeepMind video generation", tags: ["multimodal"], size: "large", url: "https://deepmind.google/technologies/veo" },
+                { id: "t_wan_video", name: "Wan Video", type: "Tool", parent: "cat_video", detection: "wan", desc: "Alibaba open-source video gen", tags: ["multimodal"], size: "large", url: "https://github.com/Wan-Video/Wan2.1" },
+                { id: "t_cogvideo", name: "CogVideoX", type: "Tool", parent: "cat_video", detection: "cogvideo", desc: "Open-source text-to-video", tags: ["multimodal"], size: "large", url: "https://github.com/THUDM/CogVideo" },
+                { id: "t_hailuo", name: "Hailuo Video", type: "Tool", parent: "cat_video", detection: "hailuo", desc: "MiniMax video generation", tags: ["multimodal"], size: "large", url: "https://hailuoai.video" },
+
+                // ========== NEW: RESEARCH TOOLS ==========
+                { id: "t_tavily", name: "Tavily", type: "Tool", parent: "cat_research", detection: "tavily", desc: "Search API for AI agents", tags: ["llm"], size: "medium", url: "https://tavily.com" },
+                { id: "t_you", name: "You.com", type: "Tool", parent: "cat_research", detection: "you", desc: "AI-powered search engine", tags: ["llm"], size: "large", url: "https://you.com" },
+                { id: "t_scispace", name: "SciSpace", type: "Tool", parent: "cat_research", detection: "scispace", desc: "AI research paper assistant", tags: ["llm"], size: "medium", url: "https://typeset.io" },
+                { id: "t_semantic_scholar", name: "Semantic Scholar", type: "Tool", parent: "cat_research", detection: "semanticscholar", desc: "Free academic search API", tags: ["data"], size: "large", url: "https://api.semanticscholar.org" },
+                { id: "t_storm", name: "Storm", type: "Tool", parent: "cat_research", detection: "storm", desc: "Stanford AI research synthesizer", tags: ["llm"], size: "small", url: "https://github.com/stanford-oval/storm" },
+
+                // ========== NEW: AI COMMUNICATION ==========
+                { id: "t_vocode", name: "Vocode", type: "Tool", parent: "cat_comm", detection: "vocode", desc: "Open-source voice agent framework", tags: ["llm", "multimodal"], size: "medium", url: "https://vocode.dev" },
+                { id: "t_pipecat", name: "Pipecat", type: "Tool", parent: "cat_comm", detection: "pipecat", desc: "Open voice AI pipeline SDK", tags: ["llm", "multimodal"], size: "medium", url: "https://pipecat.ai" },
+                { id: "t_ultravox", name: "Ultravox", type: "Tool", parent: "cat_comm", detection: "ultravox", desc: "Real-time voice AI model", tags: ["llm", "multimodal"], size: "medium", url: "https://ultravox.ai" },
+
+                // ========== NEW: AI INTERFACES ==========
+                { id: "t_copilotkit", name: "CopilotKit", type: "Tool", parent: "cat_ui", detection: "copilotkit", desc: "React AI copilot components", tags: ["llm", "infra"], size: "small", url: "https://copilotkit.ai" },
+                { id: "t_anythingllm", name: "AnythingLLM", type: "Tool", parent: "cat_ui", detection: "anythingllm", desc: "Self-hosted all-in-one AI app", tags: ["llm", "infra"], size: "small", url: "https://anythingllm.com" },
+                { id: "t_lobechat", name: "LobeChat", type: "Tool", parent: "cat_ui", detection: "lobechat", desc: "Open-source AI chat framework", tags: ["llm", "infra"], size: "medium", url: "https://github.com/lobehub/lobe-chat" },
+                { id: "t_jan", name: "Jan", type: "Tool", parent: "cat_ui", detection: "jan", desc: "Offline open-source ChatGPT alt", tags: ["llm", "infra"], size: "medium", url: "https://jan.ai" },
+
+                // ========== NEW: EVALUATION & SAFETY ==========
+                { id: "t_evidently", name: "Evidently AI", type: "Tool", parent: "cat_eval", detection: "evidently", desc: "Open-source ML monitoring", tags: ["observability"], size: "medium", url: "https://evidentlyai.com" },
+                { id: "t_patronus", name: "Patronus AI", type: "Tool", parent: "cat_eval", detection: "patronus", desc: "LLM evaluation and red-teaming", tags: ["observability"], size: "medium", url: "https://patronus.ai" },
+                { id: "t_galileo", name: "Galileo AI", type: "Tool", parent: "cat_eval", detection: "galileo", desc: "Hallucination detection platform", tags: ["observability"], size: "medium", url: "https://galileo.ai" },
+                { id: "t_arthur", name: "Arthur AI", type: "Tool", parent: "cat_safety", detection: "arthur", desc: "Enterprise AI guardrails", tags: ["llm", "observability"], size: "medium", url: "https://arthur.ai" },
+
+                // ========== NEW: VECTOR DATABASES ==========
+                { id: "t_astradb", name: "Astra DB", type: "Tool", parent: "cat_vectordb", detection: "astrapy", desc: "DataStax serverless vector DB", tags: ["data"], size: "large", url: "https://astra.datastax.com" },
+                { id: "t_mongodb_vector", name: "MongoDB Atlas Vector", type: "Tool", parent: "cat_vectordb", detection: "pymongo", desc: "MongoDB vector search", tags: ["data"], size: "large", url: "https://mongodb.com/products/platform/atlas-vector-search" },
+                { id: "t_typesense", name: "Typesense", type: "Tool", parent: "cat_vectordb", detection: "typesense", desc: "Fast search with vectors", tags: ["data"], size: "medium", url: "https://typesense.org" }
             ],
             links: []
         };
